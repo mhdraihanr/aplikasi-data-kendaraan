@@ -4,8 +4,8 @@ Aplikasi web untuk mencatat dan mengelola data kendaraan: daftar + pencarian,
 tambah, ubah, detail (read-only), dan hapus dengan konfirmasi.
 
 Dokumen ini dihasilkan dari analisis `Application Data Kendaraan.pdf`.
-Belum ada kode aplikasi — repo ini berisi **dokumentasi siap-coding** untuk
-manusia maupun AI coding agent.
+Backend sudah berjalan sampai M1 (entity, `AppDbContext`, DTO); API dan frontend
+belum. Lihat [`docs/04-TASKS.md`](docs/04-TASKS.md) untuk progres terbaru.
 
 ---
 
@@ -21,7 +21,6 @@ manusia maupun AI coding agent.
 | 06  | [`docs/06-API-CONTRACT.md`](docs/06-API-CONTRACT.md)                 | Endpoint, request/response JSON, status code                             | Butuh **menghubungkan frontend ↔ backend**    |
 | 07  | [`docs/07-DECISIONS.md`](docs/07-DECISIONS.md)                       | Semua ambiguitas dokumen asli + keputusannya                             | **Ragu soal requirement** (baca dulu!)        |
 | 08  | [`docs/08-IMPLEMENTATION-GUIDE.md`](docs/08-IMPLEMENTATION-GUIDE.md) | Panduan langkah per milestone + verifikasi + jebakan umum                | **Mulai coding step-by-step**                 |
-| —   | [`AI-AGENT-GUIDE.md`](AI-AGENT-GUIDE.md)                             | Aturan main untuk AI coding agent                                        | Kamu AI yang akan menulis kode                |
 
 **Alur baca yang disarankan:** `07-DECISIONS` → `01-PRD` → `05-BUSINESS-RULES`
 → `03-DATA-MODEL` → `06-API-CONTRACT` → `02-DESIGN` → `04-TASKS` →
@@ -31,7 +30,8 @@ manusia maupun AI coding agent.
 
 ## 🎯 Ringkasan Aplikasi
 
-**Stack:** C# ASP.NET Core Web API (.NET 8) + EF Core + SQLite · HTML/jQuery/Bootstrap 5
+**Stack:** C# ASP.NET Core Web API (.NET 8) + EF Core · HTML/jQuery/Bootstrap 5
+**Database:** SQLite untuk development, **PostgreSQL untuk production**
 
 **Layar:**
 
@@ -63,6 +63,8 @@ manusia maupun AI coding agent.
 
 ## 🚀 Rencana Menjalankan (setelah kode dibuat)
 
+**Development — SQLite:**
+
 ```bash
 # Backend — port 5000
 cd backend/DataKendaraan.Api
@@ -76,6 +78,24 @@ python -m http.server 5500
 
 Buka `http://localhost:5500`.
 
+**Production — PostgreSQL:**
+
+```bash
+# Set connection string lewat environment variable, jangan commit kredensial
+export ConnectionStrings__Default="Host=localhost;Database=kendaraan;Username=app;Password=***"
+export ASPNETCORE_ENVIRONMENT=Production
+
+cd backend/DataKendaraan.Api
+dotnet ef database update
+dotnet run
+```
+
+> Status: dukungan PostgreSQL **belum diimplementasikan**. Saat ini project hanya
+> mereferensikan `Microsoft.EntityFrameworkCore.Sqlite`. Untuk mengaktifkannya
+> perlu paket `Npgsql.EntityFrameworkCore.PostgreSQL`, `appsettings.Production.json`,
+> dan pemilihan provider di `Program.cs`. Lihat
+> [`docs/04-TASKS.md`](docs/04-TASKS.md) M1-6.
+
 ---
 
 ## 📂 Struktur Target
@@ -83,7 +103,6 @@ Buka `http://localhost:5500`.
 ```
 data-kendaraan/
 ├── README.md
-├── AI-AGENT-GUIDE.md
 ├── docs/
 │   ├── 01-PRD.md
 │   ├── 02-DESIGN.md
@@ -92,8 +111,16 @@ data-kendaraan/
 │   ├── 05-BUSINESS-RULES.md
 │   ├── 06-API-CONTRACT.md
 │   ├── 07-DECISIONS.md
+│   ├── 08-IMPLEMENTATION-GUIDE.md
 │   ├── source/                 ← PDF asli
 │   └── screenshots/            ← mockup hasil render
-├── backend/          ← belum dibuat (lihat 04-TASKS.md M0)
-└── frontend/         ← belum dibuat (lihat 04-TASKS.md M3)
+├── backend/
+│   ├── DataKendaraan.sln
+│   └── DataKendaraan.Api/
+│       ├── Models/             ← entity Kendaraan
+│       ├── Data/               ← AppDbContext
+│       ├── Dtos/               ← request & response
+│       ├── Controllers/        ← belum diisi (M2)
+│       └── Migrations/         ← belum dibuat (M1-5)
+└── frontend/                   ← belum dibuat (lihat 04-TASKS.md M3)
 ```

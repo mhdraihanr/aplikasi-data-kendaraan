@@ -13,6 +13,7 @@ data contoh justru memakai **"Bensin"** pada field Bahan Bakar dan
 **warna** (Merah/Hitam/Biru) pada field Warna.
 
 **Keputusan (dikonfirmasi user):** Ikuti mockup.
+
 - `Warna Kendaraan` = **dropdown** `Merah / Hitam / Biru / Abu-Abu`
 - `Bahan Bakar` = **text input** bebas (data contoh: "Bensin")
 
@@ -44,8 +45,9 @@ dengan Kapasitas Silinder, seolah kapasitas juga maxlength 4.
 Kapasitas Silinder = bilangan bulat > 0, tanpa batas 4 digit.
 
 **Alasan:** Kapasitas silinder realistis bisa 1000–1300 cc (motor besar) atau
+
 > 4000 cc (mobil). Membatasi 4 digit justru memotong nilai yang sah. Tahun
-pembuatan memang selalu 4 digit. Tabel PDF meleset satu baris saat ekstraksi.
+> pembuatan memang selalu 4 digit. Tabel PDF meleset satu baris saat ekstraksi.
 
 ---
 
@@ -72,6 +74,7 @@ apakah boleh diubah.
 menerima `noRegistrasi` baru dalam body dan melakukan update PK.
 
 **Aturan:**
+
 - Jika `newNoReg == oldNoReg` → update biasa.
 - Jika `newNoReg` sudah dipakai record lain → `409 Conflict`.
 - Frontend form Edit mengirim `PUT /api/kendaraan/B-7763-TXY` dengan body `{"noRegistrasi":"B-9999-XXX", ...}`.
@@ -131,7 +134,8 @@ yang langsung dibaca untuk menampilkan toast lalu dibersihkan dari URL.
 
 **Masalah:** Dokumen memberi dua opsi backend: Java (Spring & Hibernate) **atau** C# (ASP.NET).
 
-**Keputusan (dikonfirmasi user):** **C# ASP.NET Core Web API (.NET 8) + EF Core 8**, DB SQLite.
+**Keputusan (dikonfirmasi user):** **C# ASP.NET Core Web API (.NET 8) + EF Core 8**,
+DB **SQLite untuk development** dan **PostgreSQL untuk production**.
 
 **Alternatif jika nanti diminta Java:** struktur docs tetap valid; ganti Entity
 → `@Entity` JPA, DTO → record Java, controller → `@RestController`,
@@ -167,3 +171,29 @@ merek perusahaan.
 form Tambah/Edit dan halaman Detail.
 
 **Alasan:** Mengikuti mockup — teks panjang (255 char) akan merusak layout tabel.
+
+---
+
+## D-15 — PostgreSQL untuk production
+
+**Masalah:** SQLite cocok untuk development, tetapi kurang tepat untuk
+production: penulisan terkunci pada satu file, tanpa user/role, dan tanpa
+koneksi jaringan.
+
+**Keputusan (dikonfirmasi user):** **SQLite untuk development, PostgreSQL
+untuk production.**
+
+**Konsekuensi:**
+
+- Tambah paket `Npgsql.EntityFrameworkCore.PostgreSQL` saat provider production
+  diaktifkan.
+- Connection string development di `appsettings.Development.json`, production
+  lewat environment variable `ConnectionStrings__Default` — jangan commit
+  kredensial.
+- **Dua set migration** karena EF Core hanya membuat migration untuk provider
+  aktif. Rujukan:
+  [Migrations with Multiple Providers](https://learn.microsoft.com/ef/core/managing-schemas/migrations/providers).
+- Nama tabel dan kolom snake_case tetap dipakai di kedua provider.
+
+**Status:** baru keputusan dan dokumentasi. Kode masih SQLite-only sampai M1-6
+dikerjakan.

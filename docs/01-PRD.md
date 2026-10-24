@@ -4,7 +4,7 @@
 **Sumber:** `Application Data Kendaraan.pdf` (soal test)
 **Backend:** C# ASP.NET Core Web API + EF Core
 **Frontend:** HTML + CSS + JavaScript (jQuery, Bootstrap 5)
-**Database:** SQLite (file) untuk dev, mudah diganti ke SQL Server/PostgreSQL
+**Database:** SQLite (file) untuk development, **PostgreSQL untuk production**
 
 ---
 
@@ -16,6 +16,7 @@ tampilan tabel yang bisa difilter, form tambah/ubah, halaman detail read-only,
 dan konfirmasi sebelum menghapus data.
 
 **Tujuan terukur:**
+
 - Pengguna dapat menambah, mencari, melihat, mengubah, dan menghapus data kendaraan.
 - Nomor registrasi kendaraan bersifat unik dan menjadi identitas utama data.
 - Tidak ada data terhapus tanpa konfirmasi eksplisit.
@@ -23,17 +24,19 @@ dan konfirmasi sebelum menghapus data.
 ## 2. Ruang Lingkup
 
 ### In Scope
-| # | Fitur | Layar |
-|---|-------|-------|
-| F1 | Daftar data kendaraan + pencarian | Monitoring |
-| F2 | Tambah data kendaraan | Tambah Data |
-| F3 | Ubah data kendaraan | Edit Data |
-| F4 | Lihat detail (read-only) | Detail Data |
-| F5 | Hapus data + modal konfirmasi | Monitoring |
-| F6 | Validasi input & pesan error | Semua form |
-| F7 | REST API untuk semua operasi di atas | — |
+
+| #   | Fitur                                | Layar       |
+| --- | ------------------------------------ | ----------- |
+| F1  | Daftar data kendaraan + pencarian    | Monitoring  |
+| F2  | Tambah data kendaraan                | Tambah Data |
+| F3  | Ubah data kendaraan                  | Edit Data   |
+| F4  | Lihat detail (read-only)             | Detail Data |
+| F5  | Hapus data + modal konfirmasi        | Monitoring  |
+| F6  | Validasi input & pesan error         | Semua form  |
+| F7  | REST API untuk semua operasi di atas | —           |
 
 ### Out of Scope
+
 - Login / autentikasi / otorisasi per-role
 - Upload foto kendaraan
 - Export Excel/PDF
@@ -50,10 +53,12 @@ Tidak paham teknis; butuh form yang jelas dan pesan error berbahasa Indonesia.
 ## 4. User Stories & Acceptance Criteria
 
 ### US-1 — Melihat daftar kendaraan
+
 > Sebagai petugas, saya ingin melihat semua data kendaraan dalam tabel agar
 > saya tahu data apa saja yang sudah tercatat.
 
 **AC:**
+
 - [ ] Halaman Monitoring menampilkan tabel dengan kolom berurutan:
       `No | No Registrasi | Nama Pemilik | Merk Kendaraan | Tahun Pembuatan | Kapasitas | Warna | Bahan Bakar | Action`
 - [ ] Kolom **No** adalah nomor urut tampilan (1,2,3…), bukan PK.
@@ -65,13 +70,15 @@ Tidak paham teknis; butuh form yang jelas dan pesan error berbahasa Indonesia.
 - [ ] Kolom **Alamat** sengaja TIDAK ditampilkan di tabel (hanya di form/detail).
 
 ### US-2 — Mencari data kendaraan
+
 > Sebagai petugas, saya ingin mencari kendaraan berdasarkan nomor registrasi
 > atau nama pemilik agar tidak perlu scroll manual.
 
 **AC:**
+
 - [ ] Pencarian dijalankan saat tombol **Search** diklik (bukan live search).
-- [ ] Filter **No Registrasi**: pencocokan *contains*, case-insensitive (`b-7763` menemukan `B-7763-TXY`).
-- [ ] Filter **Nama Pemilik**: pencocokan *contains*, case-insensitive (`messi` menemukan `Lionel Messi`).
+- [ ] Filter **No Registrasi**: pencocokan _contains_, case-insensitive (`b-7763` menemukan `B-7763-TXY`).
+- [ ] Filter **Nama Pemilik**: pencocokan _contains_, case-insensitive (`messi` menemukan `Lionel Messi`).
 - [ ] Kedua filter dapat dikombinasikan dengan logika **AND**.
 - [ ] Filter kosong = tampilkan semua data.
 - [ ] Tombol Search dengan kedua filter kosong = reset / tampilkan semua data.
@@ -79,9 +86,11 @@ Tidak paham teknis; butuh form yang jelas dan pesan error berbahasa Indonesia.
 - [ ] Kolom nomor urut (`No`) di-reset mulai dari 1 pada hasil filter.
 
 ### US-3 — Menambah data kendaraan
+
 > Sebagai petugas, saya ingin menambah data kendaraan baru agar tercatat di sistem.
 
 **AC:**
+
 - [ ] Tombol **Add** membuka halaman Tambah Data Kendaraan.
 - [ ] Form berisi 8 field dalam layout 2 kolom:
       | Kiri | Kanan |
@@ -99,9 +108,11 @@ Tidak paham teknis; butuh form yang jelas dan pesan error berbahasa Indonesia.
       "Data yang belum disimpan akan hilang. Lanjutkan?" (opsional, nice-to-have).
 
 ### US-4 — Mengubah data kendaraan
+
 > Sebagai petugas, saya ingin mengubah data kendaraan yang salah agar data tetap akurat.
 
 **AC:**
+
 - [ ] Tautan **Edit** di tabel membuka form Edit Data Kendaraan, terisi data yang ada.
 - [ ] Semua field dapat diubah, termasuk **No Registrasi** (karena ini PK, lihat Business Rules §6.3).
 - [ ] Tombol aksi: **Ubah** (biru, primary) lalu **Kembali** (abu-abu, secondary).
@@ -110,10 +121,12 @@ Tidak paham teknis; butuh form yang jelas dan pesan error berbahasa Indonesia.
 - [ ] Validasi sama persis dengan form Tambah.
 
 ### US-5 — Melihat detail data kendaraan
+
 > Sebagai petugas, saya ingin melihat detail data kendaraan secara lengkap
 > (termasuk alamat) tanpa risiko tidak sengaja mengubahnya.
 
 **AC:**
+
 - [ ] Tautan **Detail** membuka form yang sama dengan mode Edit,
       **tetapi semua field disabled/readonly**.
 - [ ] Tidak ada tombol **Ubah**; satu-satunya tombol adalah **Kembali**.
@@ -121,10 +134,12 @@ Tidak paham teknis; butuh form yang jelas dan pesan error berbahasa Indonesia.
 - [ ] Judul halaman: "Detail Data Kendaraan".
 
 ### US-6 — Menghapus data kendaraan
+
 > Sebagai petugas, saya ingin menghapus data kendaraan yang salah masuk
 > agar tabel tetap bersih, dengan konfirmasi agar tidak salah hapus.
 
 **AC:**
+
 - [ ] Tautan **Delete** membuka modal konfirmasi di atas halaman Monitoring.
 - [ ] Teks modal persis: **"Anda yakin menghapus data {No Registrasi} ?"**
       contoh: `Anda yakin menghapus data B-7763-TXY ?`
@@ -137,34 +152,35 @@ Tidak paham teknis; butuh form yang jelas dan pesan error berbahasa Indonesia.
 
 ## 5. Field Specification
 
-| # | Field | Label UI | Tipe Input | Wajib | Batasan |
-|---|-------|----------|-----------|-------|---------|
-| 1 | Nomor Registrasi Kendaraan | No. Registrasi Kendaraan | `<input type="text">` | ✅ Ya | PK, unik, maks 20 char |
-| 2 | Nama Pemilik | Nama Pemilik | `<input type="text">` | ✅ Ya | maks 100 char |
-| 3 | Alamat | Alamat Pemilik Kendaraan | `<textarea rows=4>` | ❌ Tidak | maks 255 char |
-| 4 | Merk Kendaraan | Merk Kendaraan | `<input type="text">` | ❌ Tidak | maks 100 char |
-| 5 | Tahun Pembuatan | Tahun Pembuatan | `<input type="number">` | ❌ Tidak | 4 digit, rentang 1900–tahun berjalan |
-| 6 | Kapasitas Silinder | Kapasitas Silinder | `<input type="number">` | ❌ Tidak | bilangan bulat > 0 |
-| 7 | Warna Kendaraan | Warna Kendaraan | `<select>` | ❌ Tidak | opsi: `Merah, Hitam, Biru, Abu-Abu` |
-| 8 | Bahan Bakar | Bahan Bakar | `<input type="text">` | ❌ Tidak | maks 50 char |
+| #   | Field                      | Label UI                 | Tipe Input              | Wajib    | Batasan                              |
+| --- | -------------------------- | ------------------------ | ----------------------- | -------- | ------------------------------------ |
+| 1   | Nomor Registrasi Kendaraan | No. Registrasi Kendaraan | `<input type="text">`   | ✅ Ya    | PK, unik, maks 20 char               |
+| 2   | Nama Pemilik               | Nama Pemilik             | `<input type="text">`   | ✅ Ya    | maks 100 char                        |
+| 3   | Alamat                     | Alamat Pemilik Kendaraan | `<textarea rows=4>`     | ❌ Tidak | maks 255 char                        |
+| 4   | Merk Kendaraan             | Merk Kendaraan           | `<input type="text">`   | ❌ Tidak | maks 100 char                        |
+| 5   | Tahun Pembuatan            | Tahun Pembuatan          | `<input type="number">` | ❌ Tidak | 4 digit, rentang 1900–tahun berjalan |
+| 6   | Kapasitas Silinder         | Kapasitas Silinder       | `<input type="number">` | ❌ Tidak | bilangan bulat > 0                   |
+| 7   | Warna Kendaraan            | Warna Kendaraan          | `<select>`              | ❌ Tidak | opsi: `Merah, Hitam, Biru, Abu-Abu`  |
+| 8   | Bahan Bakar                | Bahan Bakar              | `<input type="text">`   | ❌ Tidak | maks 50 char                         |
 
 > **Catatan keputusan:** Lihat `docs/07-DECISIONS.md` untuk alasan Warna = dropdown
 > dan Bahan Bakar = text (mengikuti mockup, bukan tabel requirement yang keliru).
 
 ## 6. Non-Functional Requirements
 
-| Aspek | Target |
-|-------|--------|
-| Browser | Chrome/Edge/Firefox versi 2 tahun terakhir |
-| Responsif | Desktop-first; tabel scroll horizontal di lebar < 992px |
-| Bahasa UI | Bahasa Indonesia, termasuk pesan validasi |
-| Waktu muat daftar | < 1 detik untuk 500 baris |
-| Aksesibilitas | Setiap input punya `<label for>`; modal bisa ditutup dengan Esc |
-| Konvensi kode | Lihat `docs/../.editorconfig` & standar di PRD ini |
+| Aspek             | Target                                                          |
+| ----------------- | --------------------------------------------------------------- |
+| Browser           | Chrome/Edge/Firefox versi 2 tahun terakhir                      |
+| Responsif         | Desktop-first; tabel scroll horizontal di lebar < 992px         |
+| Bahasa UI         | Bahasa Indonesia, termasuk pesan validasi                       |
+| Waktu muat daftar | < 1 detik untuk 500 baris                                       |
+| Aksesibilitas     | Setiap input punya `<label for>`; modal bisa ditutup dengan Esc |
+| Konvensi kode     | Lihat `docs/../.editorconfig` & standar di PRD ini              |
 
 ## 7. Definisi Selesai (DoD)
 
 Sebuah fitur dianggap selesai jika:
+
 1. Acceptance criteria di atas terpenuhi semua.
 2. Berjalan end-to-end (FE → API → DB) tanpa error di console.
 3. Validasi client-side **dan** server-side aktif.

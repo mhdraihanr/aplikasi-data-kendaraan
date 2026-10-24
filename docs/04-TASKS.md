@@ -37,7 +37,7 @@ dotnet tool install --global dotnet-ef   # jika belum ada
 - [ ] `Data/DbInitializer.cs` — seed 5 data dari §7, hanya jika tabel kosong
 - [x] `Dtos/KendaraanDto.cs` + `Dtos/KendaraanRequest.cs`
 - [ ] Migration: `dotnet ef migrations add InitialCreate`
-- [ ] `Program.cs`: register `AppDbContext` (SQLite), panggil `Migrate()` + `SeedAsync()` saat startup
+- [ ] `Program.cs`: register `AppDbContext` (SQLite di dev, PostgreSQL di prod), panggil `Migrate()` + `SeedAsync()` saat startup
 - [ ] Cek: `kendaraan.db` terbentuk, 5 baris ter-seed
 
 **DoD M1:** tabel `kendaraan` ada di DB dengan 5 baris seed dan constraint lengkap.

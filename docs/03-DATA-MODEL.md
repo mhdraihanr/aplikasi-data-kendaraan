@@ -1,6 +1,7 @@
 # DATA MODEL — Aplikasi Data Kendaraan
 
-Stack: **C# ASP.NET Core Web API (.NET 8) + EF Core 8 + SQLite**
+Stack: **C# ASP.NET Core Web API (.NET 8) + EF Core 8**, database SQLite untuk
+development dan PostgreSQL untuk production.
 
 ---
 
@@ -25,18 +26,19 @@ Aplikasi ini **satu tabel saja**. Tidak ada relasi.
 
 ## 2. Tabel `kendaraan`
 
-| Kolom | Tipe | Null | Constraint | Keterangan |
-|---|---|---|---|---|
-| `no_registrasi` | `VARCHAR(20)` | NO | **PRIMARY KEY** | Nomor registrasi kendaraan (Natural PK) |
-| `nama_pemilik` | `VARCHAR(100)` | NO | — | Wajib diisi |
-| `alamat` | `VARCHAR(255)` | YES | — | Alamat pemilik |
-| `merk_kendaraan` | `VARCHAR(100)` | YES | — | Contoh: Honda PCX |
-| `tahun_pembuatan` | `INTEGER` | YES | `CHECK (tahun_pembuatan BETWEEN 1900 AND 2100)` | 4 digit |
-| `kapasitas_silinder` | `INTEGER` | YES | `CHECK (kapasitas_silinder > 0)` | cc |
-| `warna` | `VARCHAR(20)` | YES | `CHECK (warna IN ('Merah','Hitam','Biru','Abu-Abu'))` | Dropdown |
-| `bahan_bakar` | `VARCHAR(50)` | YES | — | Text bebas, contoh: Bensin |
+| Kolom                | Tipe           | Null | Constraint                                            | Keterangan                              |
+| -------------------- | -------------- | ---- | ----------------------------------------------------- | --------------------------------------- |
+| `no_registrasi`      | `VARCHAR(20)`  | NO   | **PRIMARY KEY**                                       | Nomor registrasi kendaraan (Natural PK) |
+| `nama_pemilik`       | `VARCHAR(100)` | NO   | —                                                     | Wajib diisi                             |
+| `alamat`             | `VARCHAR(255)` | YES  | —                                                     | Alamat pemilik                          |
+| `merk_kendaraan`     | `VARCHAR(100)` | YES  | —                                                     | Contoh: Honda PCX                       |
+| `tahun_pembuatan`    | `INTEGER`      | YES  | `CHECK (tahun_pembuatan BETWEEN 1900 AND 2100)`       | 4 digit                                 |
+| `kapasitas_silinder` | `INTEGER`      | YES  | `CHECK (kapasitas_silinder > 0)`                      | cc                                      |
+| `warna`              | `VARCHAR(20)`  | YES  | `CHECK (warna IN ('Merah','Hitam','Biru','Abu-Abu'))` | Dropdown                                |
+| `bahan_bakar`        | `VARCHAR(50)`  | YES  | —                                                     | Text bebas, contoh: Bensin              |
 
 **Catatan desain:**
+
 - Nama kolom DB pakai **snake_case**, nama properti C# pakai **PascalCase**,
   nama field JSON API pakai **camelCase** (lihat `docs/02-DESIGN.md` §12
   untuk mapping). Ini yang diekspektasikan frontend.
@@ -200,16 +202,16 @@ public class KendaraanRequest
 
 ## 6. Mapping Nama
 
-| DB (snake_case) | C# property | JSON API (camelCase) | HTML form `name` |
-|---|---|---|---|
-| `no_registrasi` | `NoRegistrasi` | `noRegistrasi` | `noRegistrasi` |
-| `nama_pemilik` | `NamaPemilik` | `namaPemilik` | `namaPemilik` |
-| `alamat` | `Alamat` | `alamat` | `alamat` |
-| `merk_kendaraan` | `MerkKendaraan` | `merkKendaraan` | `merkKendaraan` |
-| `tahun_pembuatan` | `TahunPembuatan` | `tahunPembuatan` | `tahunPembuatan` |
-| `kapasitas_silinder` | `KapasitasSilinder` | `kapasitasSilinder` | `kapasitasSilinder` |
-| `warna` | `Warna` | `warna` | `warna` |
-| `bahan_bakar` | `BahanBakar` | `bahanBakar` | `bahanBakar` |
+| DB (snake_case)      | C# property         | JSON API (camelCase) | HTML form `name`    |
+| -------------------- | ------------------- | -------------------- | ------------------- |
+| `no_registrasi`      | `NoRegistrasi`      | `noRegistrasi`       | `noRegistrasi`      |
+| `nama_pemilik`       | `NamaPemilik`       | `namaPemilik`        | `namaPemilik`       |
+| `alamat`             | `Alamat`            | `alamat`             | `alamat`            |
+| `merk_kendaraan`     | `MerkKendaraan`     | `merkKendaraan`      | `merkKendaraan`     |
+| `tahun_pembuatan`    | `TahunPembuatan`    | `tahunPembuatan`     | `tahunPembuatan`    |
+| `kapasitas_silinder` | `KapasitasSilinder` | `kapasitasSilinder`  | `kapasitasSilinder` |
+| `warna`              | `Warna`             | `warna`              | `warna`             |
+| `bahan_bakar`        | `BahanBakar`        | `bahanBakar`         | `bahanBakar`        |
 
 > ASP.NET Core default men-serialize ke camelCase, jadi `KendaraanDto`
 > otomatis keluar sebagai `noRegistrasi`, `namaPemilik`, dst. Jangan
@@ -220,27 +222,30 @@ public class KendaraanRequest
 Wajib di-seed saat pertama kali jalan (dipakai frontend & demo). Data diambil
 dari mockup PDF:
 
-| no_registrasi | nama_pemilik | alamat | merk | tahun | kapasitas | warna | bahan_bakar |
-|---|---|---|---|---|---|---|---|
-| B-7763-TXY | Lionel Messi | Jl. Achmad Yani No 89 Jakarta Pusat | Honda PCX | 2018 | 150 | Hitam | Bensin |
-| B-1678-BDG | Cristiano Ronaldo | Jl. Sudirman No 12 Bandung | Honda Vario | 2020 | 150 | Merah | Bensin |
-| B-3461-UPQ | Bambang Pamungkas | Jl. Gatot Subroto No 5 Jakarta Selatan | Honda Beat | 2019 | 125 | Biru | Bensin |
-| B-3110-BGT | Natasha Romanov | Jl. Kemang Raya No 44 Jakarta Selatan | Honda Scoopy | 2020 | 125 | Hitam | Bensin |
-| B-7829-TYP | Entis Siti Jubaedah | Jl. Diponegoro No 7 Bandung | Honda Beat | 2019 | 125 | Merah | Bensin |
+| no_registrasi | nama_pemilik        | alamat                                 | merk         | tahun | kapasitas | warna | bahan_bakar |
+| ------------- | ------------------- | -------------------------------------- | ------------ | ----- | --------- | ----- | ----------- |
+| B-7763-TXY    | Lionel Messi        | Jl. Achmad Yani No 89 Jakarta Pusat    | Honda PCX    | 2018  | 150       | Hitam | Bensin      |
+| B-1678-BDG    | Cristiano Ronaldo   | Jl. Sudirman No 12 Bandung             | Honda Vario  | 2020  | 150       | Merah | Bensin      |
+| B-3461-UPQ    | Bambang Pamungkas   | Jl. Gatot Subroto No 5 Jakarta Selatan | Honda Beat   | 2019  | 125       | Biru  | Bensin      |
+| B-3110-BGT    | Natasha Romanov     | Jl. Kemang Raya No 44 Jakarta Selatan  | Honda Scoopy | 2020  | 125       | Hitam | Bensin      |
+| B-7829-TYP    | Entis Siti Jubaedah | Jl. Diponegoro No 7 Bandung            | Honda Beat   | 2019  | 125       | Merah | Bensin      |
 
 Cara seed: `DbInitializer.SeedAsync(context)` dipanggil dari `Program.cs`
 setelah `db.Database.Migrate()` — hanya menyisipkan jika tabel masih kosong.
 
 ## 8. Strategi Database
 
-| Lingkungan | Provider | Connection string |
-|---|---|---|
-| Development | SQLite | `Data Source=kendaraan.db` |
-| Testing | SQLite in-memory (`DataSource=:memory:`) | `Data Source=:memory:` |
-| (opsional) Production | SQL Server / PostgreSQL | ganti provider di `Program.cs` |
+| Lingkungan  | Provider                                 | Connection string                                       |
+| ----------- | ---------------------------------------- | ------------------------------------------------------- |
+| Development | SQLite                                   | `Data Source=kendaraan.db`                              |
+| Testing     | SQLite in-memory (`DataSource=:memory:`) | `Data Source=:memory:`                                  |
+| Production  | **PostgreSQL**                           | `Host=...;Database=kendaraan;Username=...;Password=...` |
 
 Gunakan **EF Core Migrations** (`dotnet ef migrations add InitialCreate`),
 bukan `EnsureCreated()`, supaya skema bisa di-evolve nanti.
+
+Dua provider berarti dua set migration (lihat `docs/07-DECISIONS.md` D-15).
+Jangan memakai migration SQLite untuk production PostgreSQL.
 
 ## 9. Aturan Integritas
 

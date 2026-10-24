@@ -20,13 +20,13 @@ kode (`// BR-06`) dan dari test case.
 
 Diterapkan sebelum validasi & penyimpanan:
 
-| Field | Perlakuan |
-|---|---|
-| `noRegistrasi` | `Trim()`. Simpan apa adanya (jangan auto-uppercase — data boleh berisi format lain). |
-| `namaPemilik` | `Trim()`, kolaps spasi ganda jadi satu. |
-| `alamat`, `merkKendaraan`, `bahanBakar` | `Trim()`. |
-| `warna` | `Trim()`, lalu pencocokan **case-insensitive** ke 4 opsi; simpan bentuk kanonik (`Merah`, `Hitam`, `Biru`, `Abu-Abu`). Nilai di luar itu → `400`. |
-| Field kosong (`""`) | Disimpan sebagai `NULL`, bukan string kosong. |
+| Field                                   | Perlakuan                                                                                                                                         |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `noRegistrasi`                          | `Trim()`. Simpan apa adanya (jangan auto-uppercase — data boleh berisi format lain).                                                              |
+| `namaPemilik`                           | `Trim()`, kolaps spasi ganda jadi satu.                                                                                                           |
+| `alamat`, `merkKendaraan`, `bahanBakar` | `Trim()`.                                                                                                                                         |
+| `warna`                                 | `Trim()`, lalu pencocokan **case-insensitive** ke 4 opsi; simpan bentuk kanonik (`Merah`, `Hitam`, `Biru`, `Abu-Abu`). Nilai di luar itu → `400`. |
+| Field kosong (`""`)                     | Disimpan sebagai `NULL`, bukan string kosong.                                                                                                     |
 
 **Alasan:** string kosong vs NULL menimbulkan dua representasi "tidak ada nilai"
 yang menyulitkan query dan tampilan.
@@ -107,27 +107,27 @@ Nomor registrasi boleh diubah lewat halaman Edit.
 
 ## BR-10 — Perilaku Pencarian
 
-| Aspek | Aturan |
-|---|---|
-| Trigger | Hanya saat tombol **Search** diklik atau Enter di input (bukan live search per ketikan) |
-| Operator | `contains` (`LIKE %nilai%`), **case-insensitive** |
-| Kombinasi | `noRegistrasi` DAN `namaPemilik` (AND, bukan OR) |
-| Filter kosong | Diabaikan, bukan dianggap mencocokkan string kosong |
-| Keduanya kosong | Tampilkan **semua** data (fungsi reset) |
-| Hasil kosong | Tabel disembunyikan, tampil "Data kendaraan tidak ditemukan" |
-| Urutan | `noRegistrasi` ASC selalu |
-| Nomor urut | Di-reset mulai 1 pada tiap hasil filter |
+| Aspek           | Aturan                                                                                  |
+| --------------- | --------------------------------------------------------------------------------------- |
+| Trigger         | Hanya saat tombol **Search** diklik atau Enter di input (bukan live search per ketikan) |
+| Operator        | `contains` (`LIKE %nilai%`), **case-insensitive**                                       |
+| Kombinasi       | `noRegistrasi` DAN `namaPemilik` (AND, bukan OR)                                        |
+| Filter kosong   | Diabaikan, bukan dianggap mencocokkan string kosong                                     |
+| Keduanya kosong | Tampilkan **semua** data (fungsi reset)                                                 |
+| Hasil kosong    | Tabel disembunyikan, tampil "Data kendaraan tidak ditemukan"                            |
+| Urutan          | `noRegistrasi` ASC selalu                                                               |
+| Nomor urut      | Di-reset mulai 1 pada tiap hasil filter                                                 |
 
 ## BR-11 — Mode Detail vs Edit
 
 Keduanya memakai layout form yang **sama persis**, dibedakan oleh perilaku:
 
-| | Edit | Detail |
-|---|---|---|
-| Field | aktif | `disabled` |
-| Tombol aksi | `Ubah`, `Kembali` | `Kembali` saja |
+|             | Edit                      | Detail                    |
+| ----------- | ------------------------- | ------------------------- |
+| Field       | aktif                     | `disabled`                |
+| Tombol aksi | `Ubah`, `Kembali`         | `Kembali` saja            |
 | Sumber data | `GET /api/kendaraan/{id}` | `GET /api/kendaraan/{id}` |
-| Aksi simpan | `PUT` lalu redirect | tidak ada |
+| Aksi simpan | `PUT` lalu redirect       | tidak ada                 |
 
 - Detail **tidak** boleh mengirim request `PUT` dalam kondisi apa pun.
 - Field `disabled` (bukan `readonly`) dipakai agar nilai tidak ikut ter-submit.
@@ -137,12 +137,12 @@ Keduanya memakai layout form yang **sama persis**, dibedakan oleh perilaku:
 
 Hanya berlaku di presentasi, **tidak** mengubah data tersimpan:
 
-| Kolom | Aturan |
-|---|---|
-| `No` | Nomor urut hasil query (1,2,3…), bukan nilai dari DB |
-| `Kapasitas` | `{nilai} cc` — contoh `150 cc` |
+| Kolom                     | Aturan                                                  |
+| ------------------------- | ------------------------------------------------------- |
+| `No`                      | Nomor urut hasil query (1,2,3…), bukan nilai dari DB    |
+| `Kapasitas`               | `{nilai} cc` — contoh `150 cc`                          |
 | Semua field `NULL`/kosong | Ditampilkan `-` (dash), bukan `null`/`undefined`/kosong |
-| `Tahun Pembuatan` | Apa adanya, 4 digit |
+| `Tahun Pembuatan`         | Apa adanya, 4 digit                                     |
 
 ## BR-13 — Keamanan Input Tampilan
 
@@ -162,7 +162,8 @@ Hanya berlaku di presentasi, **tidak** mengubah data tersimpan:
 
 ## BR-15 — Siklus Hidup Data
 
-- Data persisten di SQLite (`kendaraan.db`), bertahan setelah server restart.
+- Data persisten di database (`kendaraan.db` untuk SQLite dev, PostgreSQL untuk
+  production), bertahan setelah server restart.
 - Seed 5 baris hanya dijalankan **jika tabel kosong**; restart tidak
   menduplikasi data.
 - Tidak ada mekanisme backup/restore otomatis di versi ini.
@@ -173,15 +174,15 @@ Hanya berlaku di presentasi, **tidak** mengubah data tersimpan:
 
 Rujukan silang ke `docs/04-TASKS.md` M4.
 
-| Aturan | Test case M4 |
-|---|---|
-| BR-01 | #7 (Add No Reg duplikat) |
-| BR-03 | #6 (Add tanpa Nama Pemilik) |
-| BR-04 | #8 (Edit tahun "abc" / di luar rentang) |
-| BR-05 | — (uji di unit test controller) |
-| BR-06 | — (uji unit: warna tidak valid → 400) |
-| BR-08 | — (uji unit: PUT PK bentrok → 409) |
-| BR-09 | #10, #11 |
-| BR-10 | #2, #3, #4 |
-| BR-11 | #9 |
-| BR-15 | #12 |
+| Aturan | Test case M4                            |
+| ------ | --------------------------------------- |
+| BR-01  | #7 (Add No Reg duplikat)                |
+| BR-03  | #6 (Add tanpa Nama Pemilik)             |
+| BR-04  | #8 (Edit tahun "abc" / di luar rentang) |
+| BR-05  | — (uji di unit test controller)         |
+| BR-06  | — (uji unit: warna tidak valid → 400)   |
+| BR-08  | — (uji unit: PUT PK bentrok → 409)      |
+| BR-09  | #10, #11                                |
+| BR-10  | #2, #3, #4                              |
+| BR-11  | #9                                      |
+| BR-15  | #12                                     |
