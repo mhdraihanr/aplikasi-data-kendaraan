@@ -11,17 +11,17 @@ Legend: `[ ]` belum · `[x]` selesai · `[~]` sedang dikerjakan
 
 - [x] Buat solution & project
       `bash
-    mkdir backend && cd backend
-    dotnet new webapi -n DataKendaraan.Api -f net8.0
-    dotnet new sln -n DataKendaraan
-    dotnet sln add DataKendaraan.Api/DataKendaraan.Api.csproj
-    `
+mkdir backend && cd backend
+dotnet new webapi -n DataKendaraan.Api -f net8.0
+dotnet new sln -n DataKendaraan
+dotnet sln add DataKendaraan.Api/DataKendaraan.Api.csproj
+`
 - [x] Tambah paket
       `bash
-    dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Sqlite
-    dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Design
-    dotnet tool install --global dotnet-ef   # jika belum ada
-    `
+dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Sqlite
+dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Design
+dotnet tool install --global dotnet-ef   # jika belum ada
+`
 - [x] Buat folder: `Models/`, `Data/`, `Dtos/`, `Controllers/`
 - [x] `.gitignore` (bin, obj, _.db, _.db-shm, \*.db-wal)
 - [x] `appsettings.Development.json` → `"ConnectionStrings": { "Default": "Data Source=kendaraan.db" }`
@@ -32,10 +32,10 @@ Legend: `[ ]` belum · `[x]` selesai · `[~]` sedang dikerjakan
 
 ## M1 — Data Layer
 
-- [ ] `Models/Kendaraan.cs` — sesuai `docs/03-DATA-MODEL.md` §4
-- [ ] `Data/AppDbContext.cs` — DbSet + OnModelCreating (PK, index nama_pemilik, CHECK warna & tahun)
+- [x] `Models/Kendaraan.cs` — sesuai `docs/03-DATA-MODEL.md` §4
+- [x] `Data/AppDbContext.cs` — DbSet + OnModelCreating (PK, index nama_pemilik, CHECK warna & tahun)
 - [ ] `Data/DbInitializer.cs` — seed 5 data dari §7, hanya jika tabel kosong
-- [ ] `Dtos/KendaraanDto.cs` + `Dtos/KendaraanRequest.cs`
+- [x] `Dtos/KendaraanDto.cs` + `Dtos/KendaraanRequest.cs`
 - [ ] Migration: `dotnet ef migrations add InitialCreate`
 - [ ] `Program.cs`: register `AppDbContext` (SQLite), panggil `Migrate()` + `SeedAsync()` saat startup
 - [ ] Cek: `kendaraan.db` terbentuk, 5 baris ter-seed
@@ -56,8 +56,8 @@ Semua endpoint di bawah harus muncul di Swagger dan berfungsi lewat curl/Postman
 - [ ] `DELETE /api/kendaraan/{noRegistrasi}` - `204 NoContent` · `404` not found
 - [ ] Error response format seragam:
       `json
-    { "message": "Nomor registrasi sudah terdaftar.", "errors": { "noRegistrasi": ["..."] } }
-    `
+{ "message": "Nomor registrasi sudah terdaftar.", "errors": { "noRegistrasi": ["..."] } }
+`
 - [ ] CORS policy `AllowFrontend` untuk origin `http://localhost:5500` (Live Server) & `http://127.0.0.1:5500`
 - [ ] Trim whitespace pada `noRegistrasi` & `namaPemilik` sebelum simpan
 - [ ] Normalisasi: `Warna` case-insensitive match ke opsi valid, atau tolak 400
