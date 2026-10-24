@@ -7,9 +7,17 @@ verifikasi**; sumber kebenaran tetap:
 `07-DECISIONS` → `01-PRD` → `05-BUSINESS-RULES` → `03-DATA-MODEL` →
 `06-API-CONTRACT` → `02-DESIGN` → `04-TASKS`.
 
-**Status repo saat panduan dibuat (2026-10-24):** `backend/` dan `frontend/`
-masih kosong; seluruh task M0–M5 belum dikerjakan. Perbarui catatan status ini
-setiap kali satu milestone selesai.
+**Status repo (dicek 2026-10-24):** Git sudah diinisialisasi. M0 **selesai
+secara teknis** (`dotnet build` 0 error, server jalan di port 5000, `/swagger` 200) dan checklist M0 di `04-TASKS.md` sudah `[x]`.
+
+> **Catatan history Git:** dua commit M0 sempat dibuat lalu **di-reset** atas
+> permintaan user. Saat ini `git log` hanya berisi satu commit:
+> `182b556 chore: dokumentasi awal dan .gitignore`, sementara perubahan M0
+> masih **unstaged** di working tree. Lihat bagian "Commit message yang
+> disarankan" di akhir dokumen.
+
+`M1–M5` belum dikerjakan. Perbarui catatan status ini setiap kali satu
+milestone selesai.
 
 ---
 
@@ -30,7 +38,15 @@ Jika `dotnet ef` belum ada:
 dotnet tool install --global dotnet-ef --version 8.*
 ```
 
-Pastikan folder `%USERPROFILE%\.dotnet\tools` ada di `PATH`, lalu buka ulang terminal.
+> **Kondisi repo saat ini:** sudah ada tool manifest lokal di
+> `.config/dotnet-tools.json` yang mem-pin `dotnet-ef` **8.0.32** (sesuai EF
+> Core 8). Jalankan `dotnet tool restore` sekali setelah clone, lalu `dotnet ef`
+> langsung bisa dipakai dari folder repo — tanpa perlu global tool atau
+> mengubah `PATH`.
+>
+> Global tool `dotnet-ef` 10.x yang terpasang di mesin ini **tidak** terdeteksi
+> oleh shell karena `%USERPROFILE%\.dotnet\tools` belum ada di `PATH`. Tool
+> manifest lokal adalah solusi yang dipakai.
 
 ### 0.2 Port dan URL
 
@@ -52,7 +68,11 @@ disiapkan untuk `http://localhost:5000`.
 4. Setiap kali task selesai, ubah `[ ]` menjadi `[x]` di `docs/04-TASKS.md`.
 5. Jangan commit `bin/`, `obj/`, `*.db`, `.vs/`, atau `node_modules/`.
 6. Jika menemukan keputusan baru, catat sebagai `D-xx` di `docs/07-DECISIONS.md`.
-7. Satu milestone sebaiknya satu commit agar mudah di-rollback.
+7. Satu milestone sebaiknya satu commit agar mudah di-rollback — **tetapi**
+   lihat aturan 8.
+8. **Jangan pernah `git commit` atau `git push` tanpa persetujuan eksplisit
+   user.** Siapkan perubahan + usulkan commit message; user yang mengeksekusi
+   commit. Ini berlaku juga untuk "commit kecil" atau "commit perbaikan".
 
 ### 0.4 Struktur target
 
@@ -82,6 +102,30 @@ data-kendaraan/
 └── docs/
 ```
 
+### 0.5 Jangan auto-format `04-TASKS.md`
+
+File `docs/04-TASKS.md` berisi **code fence** (`bash`, `json`) dan **wildcard**
+(`*.db`). Formatter Markdown otomatis (Prettier, markdownlint `--fix`,
+format-on-save) pernah merusaknya menjadi:
+
+| Rusak                                               | Seharusnya                    |
+| --------------------------------------------------- | ----------------------------- |
+| backtick tunggal di awal blok kode (` `bash `)      | triple backtick (` ```bash `) |
+| wildcard ter-escape (`_.db`, `\*.db-wal`)           | `*.db`, `*.db-wal`            |
+| sub-bullet tergabung satu baris (`- [ ] A - [ ] B`) | tiap sub-bullet baris sendiri |
+
+**Aturan:**
+
+- Jangan jalankan formatter otomatis pada folder `docs/`.
+- Jika format-on-save aktif, kecualikan `docs/**/*.md`.
+- Setelah mengedit `04-TASKS.md`, verifikasi jumlah triple-backtick **genap**:
+
+  ````powershell
+  (Select-String -Path docs/04-TASKS.md -Pattern '```' -AllMatches).Matches.Count % 2
+  ````
+
+  Hasil `0` = seimbang.
+
 ---
 
 ## M0 — Bootstrap Project
@@ -89,16 +133,20 @@ data-kendaraan/
 **Target checklist:** M0-1 s/d M0-5 di `04-TASKS.md`, plus M0-0 (di luar
 checklist, tapi wajib dilakukan lebih dulu).
 
-### M0-0 — Inisialisasi Git (sebelum menulis kode)
+### M0-0 — Inisialisasi Git (referensi historis)
 
-Lakukan **sebelum M0-1**, bukan setelahnya. Tujuannya agar `bin/`, `obj/`, dan
+> **Status: SUDAH DILAKUKAN.** Repo sudah punya `.git` dengan commit awal
+> `182b556 chore: dokumentasi awal dan .gitignore`. **Jangan ulangi langkah
+> ini.** Bagian ini dipertahankan hanya sebagai dokumentasi urutan yang benar.
+
+Langkah ini idealnya dilakukan **sebelum M0-1**, agar `bin/`, `obj/`, dan
 `*.db` yang muncul saat `dotnet build/run` tidak pernah masuk staging.
 
 ```powershell
 cd d:\Projects\Fullstack\data-kendaraan
 git init
 git add .
-git commit -m "chore: dokumentasi awal dan .gitignore"
+git commit -m "chore: dokumentasi awal dan .gitignore"   # butuh izin user
 ```
 
 **Verifikasi:**
@@ -118,8 +166,8 @@ git ls-files | Select-String -Pattern "(^|/)(bin|obj)/|\.db$"
   git commit -m "chore: terapkan .gitignore"
   ```
 
-> Repo ini **belum** punya `.git` (dicek 2026-10-24). `.gitignore` di root
-> sudah mencakup `bin/`, `obj/`, `*.db`, `.vs/`, dan `node_modules/`.
+`.gitignore` di root sudah mencakup `bin/`, `obj/`, `*.db`, `.vs/`, dan
+`node_modules/` — sudah diverifikasi dengan `git check-ignore`.
 
 ### M0-1 — Buat solution dan project
 
@@ -162,7 +210,8 @@ dotnet add package Microsoft.EntityFrameworkCore.Design --version 8.*
 ```
 
 Jika `--version 8.*` tidak diterima oleh NuGet CLI, gunakan versi `8.0.x`
-terbaru yang tersedia, misalnya `--version 8.0.11`.
+terbaru yang tersedia. **Kondisi repo saat ini:** kedua paket sudah ter-resolve
+ke `8.0.32`, jadi langkah ini tidak perlu diulang.
 
 **Verifikasi:**
 
@@ -218,13 +267,25 @@ Tidak perlu membuat ulang jika isinya sudah sesuai.
 }
 ```
 
-**b. Port** — buka `Properties/launchSettings.json`, ubah profile HTTP menjadi:
+**b. Port** — buka `Properties/launchSettings.json`. Profile `http` memakai:
 
 ```json
 "applicationUrl": "http://localhost:5000"
 ```
 
-Hapus/abaikan profile HTTPS agar tidak ada redirect ke `https://localhost:5001`.
+Profile `https` **tetap ada** dan sudah diselaraskan ke port yang sama:
+
+```json
+"applicationUrl": "https://localhost:5001;http://localhost:5000"
+```
+
+Profile `IIS Express` juga memakai `http://localhost:5000`. Yang penting:
+selalu jalankan dengan `--launch-profile http` (atau `dotnet run` biasa yang
+memilih profile pertama) agar frontend tidak kena CORS karena port berbeda.
+
+> `app.UseHttpsRedirection()` **sudah dihapus** dari `Program.cs`. Jangan
+> tambahkan kembali — redirect ke HTTPS akan memutus request `http://localhost:5000`
+> dari frontend.
 
 **c. `Program.cs`** — hapus baris `app.UseHttpsRedirection();` jika ada, dan
 tambahkan di paling bawah:
@@ -247,11 +308,12 @@ Hentikan server dengan `Ctrl+C`.
 
 ### Gate M0
 
-- [ ] `dotnet build` sukses.
-- [ ] `dotnet run` listens di `http://localhost:5000`.
-- [ ] `/swagger` terbuka.
-- [ ] Tidak ada redirect ke HTTPS.
-- [ ] Checklist M0 di `04-TASKS.md` dicentang.
+- [x] `dotnet build` sukses — diverifikasi: 0 Warning, 0 Error.
+- [x] `dotnet run` listens di `http://localhost:5000` — diverifikasi dari log startup.
+- [x] `/swagger` terbuka — `swagger-ui:200`, `swagger-json:200`.
+- [x] Tidak ada redirect ke HTTPS — `GET /api/kendaraan` → `404`, bukan `307`.
+- [x] `dotnet ef --version` → `8.0.32` (via `.config/dotnet-tools.json`).
+- [x] Checklist M0 di `04-TASKS.md` dicentang.
 
 ---
 
@@ -331,8 +393,9 @@ Aturan DTO:
 public string? Warna { get; set; }
 ```
 
-Tanpa `(?i)` dan `\s*`, nilai `merah` atau `Merah` akan ditolak sebelum
-controller sempat menormalisasinya.
+Tanpa `(?i)` dan `\s*`, nilai `merah` (huruf kecil) atau `Merah` (berspasi)
+akan ditolak sebelum controller sempat menormalisasinya. Nilai `Merah` sendiri
+sudah cocok dengan regex, jadi tidak perlu dikhawatirkan.
 
 ### M1-4 — `DbInitializer`
 
@@ -739,7 +802,14 @@ Tidak perlu `AllowCredentials()`.
 
 ### M2-10 — Smoke test dengan `curl.exe`
 
-Jalankan server, lalu dari terminal lain:
+Jalankan server, lalu dari terminal lain.
+
+> **Shell matters.** Contoh multi-baris di bawah memakai backtick (`` ` ``)
+> sebagai line continuation — itu **hanya berlaku di PowerShell**. Di Git Bash
+> (MINGW64) backtick adalah command substitution dan perintah akan gagal.
+> Jika memakai Git Bash, tulis tiap `curl` dalam **satu baris** tanpa backtick.
+
+**PowerShell:**
 
 ```powershell
 # List semua
@@ -1024,16 +1094,16 @@ Jika memilih alternatif ini, pastikan load selesai sebelum binding event.
 
 **M3.3-2 — Mode dan ID**
 
-Setiap halaman form wajib punya atribut `data-mode` pada `<body>`:
+Setiap halaman form punya **satu** `<body>` dengan atribut `data-mode` yang
+berbeda. Jangan membuat `<body>` bersarang — ini tiga file terpisah:
 
 ```html
+<!-- tambah.html -->
 <body data-mode="tambah">
-  <!-- tambah.html -->
+  <!-- edit.html -->
   <body data-mode="edit">
-    <!-- edit.html -->
-    <body data-mode="detail">
-      <!-- detail.html -->
-    </body>
+    <!-- detail.html -->
+    <body data-mode="detail"></body>
   </body>
 </body>
 ```
@@ -1369,44 +1439,94 @@ Tidak boleh ada `bin/`, `obj/`, `*.db`, atau `node_modules/` yang ter-track.
 
 ## Lampiran A — Peta Task → Langkah
 
-| Task di `04-TASKS.md`  | Langkah panduan   |
-| ---------------------- | ----------------- |
-| — (prasyarat)          | M0-0 (git init)   |
-| M0 — Bootstrap Project | M0-1 s/d M0-5     |
-| M1 — Data Layer        | M1-1 s/d M1-7     |
-| M2 — REST API          | M2-1 s/d M2-10    |
-| M3.1 — Kerangka        | M3.1-1 s/d M3.1-4 |
-| M3.2 — Monitoring      | M3.2-1 s/d M3.2-7 |
-| M3.3 — Form            | M3.3-1 s/d M3.3-9 |
-| M3.4 — Polish          | M3.4              |
-| M4 — Testing           | M4-1 s/d M4-4     |
-| M5 — Delivery          | M5-1 s/d M5-5     |
+| Task di `04-TASKS.md`  | Langkah panduan                     |
+| ---------------------- | ----------------------------------- |
+| — (prasyarat)          | M0-0 (git init — **sudah selesai**) |
+| M0 — Bootstrap Project | M0-1 s/d M0-5                       |
+| M1 — Data Layer        | M1-1 s/d M1-7                       |
+| M2 — REST API          | M2-1 s/d M2-10                      |
+| M3.1 — Kerangka        | M3.1-1 s/d M3.1-4                   |
+| M3.2 — Monitoring      | M3.2-1 s/d M3.2-7                   |
+| M3.3 — Form            | M3.3-1 s/d M3.3-9                   |
+| M3.4 — Polish          | M3.4                                |
+| M4 — Testing           | M4-1 s/d M4-4                       |
+| M5 — Delivery          | M5-1 s/d M5-5                       |
 
 ---
 
 ## Lampiran B — Jebakan Umum
 
-| Gejala                          | Penyebab                                   | Solusi                                                              |
-| ------------------------------- | ------------------------------------------ | ------------------------------------------------------------------- |
-| `KendaraanController` tidak ada | Template .NET 8 memakai minimal API        | Buat project dengan `--use-controllers`                             |
-| Swagger tidak terbuka           | Port bukan 5000 / HTTPS redirect           | Set `applicationUrl`, hapus `UseHttpsRedirection`                   |
-| `dotnet ef` not found           | Global tool belum di PATH                  | Install `dotnet-ef`, buka ulang terminal                            |
-| Frontend kena CORS              | Origin tidak persis / server bukan 5500    | Tambahkan `http://localhost:5500` dan `http://127.0.0.1:5500`       |
-| `PUT` PK berubah jadi insert    | Entity detached + `Update()`               | Load tracked entity, ubah properti, `SaveChanges()`                 |
-| Filter `messi` tidak menemukan  | Case-sensitive                             | Gunakan `ToLower().Contains()`                                      |
-| `merah` ditolak `400`           | Regex DTO case-sensitive                   | Tambahkan `(?i)` dan izinkan whitespace, atau validasi setelah trim |
-| Error 400 tidak sesuai format   | `[ApiController]` memakai `ProblemDetails` | Set `InvalidModelStateResponseFactory`                              |
-| DELETE memicu parse error       | `dataType: 'json'` pada `204`              | Jangan paksa JSON untuk DELETE                                      |
-| Data seed dobel                 | Seed tidak mengecek tabel kosong           | `if (await db.Kendaraan.AnyAsync()) return;`                        |
-| Test saling memengaruhi         | Database in-memory dibagi                  | Factory/connection baru per test class                              |
-| XSS di tabel                    | Nilai API langsung masuk `innerHTML`       | `escapeHtml()` / `textContent`                                      |
+| Gejala                          | Penyebab                                    | Solusi                                                              |
+| ------------------------------- | ------------------------------------------- | ------------------------------------------------------------------- |
+| `KendaraanController` tidak ada | Template .NET 8 memakai minimal API         | Buat project dengan `--use-controllers`                             |
+| Swagger tidak terbuka           | Port bukan 5000 / HTTPS redirect            | Set `applicationUrl`, hapus `UseHttpsRedirection`                   |
+| `dotnet ef` not found           | Global tool belum di PATH                   | `dotnet tool restore` (manifest lokal 8.0.32 sudah ada)             |
+| Frontend kena CORS              | Origin tidak persis / server bukan 5500     | Tambahkan `http://localhost:5500` dan `http://127.0.0.1:5500`       |
+| `PUT` PK berubah jadi insert    | Entity detached + `Update()`                | Load tracked entity, ubah properti, `SaveChanges()`                 |
+| Filter `messi` tidak menemukan  | Case-sensitive                              | Gunakan `ToLower().Contains()`                                      |
+| `merah` ditolak `400`           | Regex DTO case-sensitive                    | Tambahkan `(?i)` dan izinkan whitespace, atau validasi setelah trim |
+| Error 400 tidak sesuai format   | `[ApiController]` memakai `ProblemDetails`  | Set `InvalidModelStateResponseFactory`                              |
+| DELETE memicu parse error       | `dataType: 'json'` pada `204`               | Jangan paksa JSON untuk DELETE                                      |
+| Data seed dobel                 | Seed tidak mengecek tabel kosong            | `if (await db.Kendaraan.AnyAsync()) return;`                        |
+| Test saling memengaruhi         | Database in-memory dibagi                   | Factory/connection baru per test class                              |
+| XSS di tabel                    | Nilai API langsung masuk `innerHTML`        | `escapeHtml()` / `textContent`                                      |
+| `04-TASKS.md` rusak             | Formatter Markdown auto-fix                 | Kecualikan `docs/**/*.md`, cek jumlah fence genap (lihat §0.5)      |
+| `curl` gagal di Git Bash        | Backtick line-continuation hanya PowerShell | Tulis satu baris atau jalankan di PowerShell                        |
 
 ---
 
-## Lampiran C — Urutan Commit yang Disarankan
+## Lampiran C — Commit Message Siap Pakai
+
+> **Jangan jalankan `git commit` tanpa izin user.** Bagian ini hanya
+> menyediakan teks commit message; user yang mengeksekusi.
+
+### C.1 — Perubahan M0 yang saat ini unstaged
+
+File yang tercakup: `backend/DataKendaraan.Api/DataKendaraan.Api.http`,
+`Properties/launchSettings.json`, `.config/dotnet-tools.json`, `docs/04-TASKS.md`,
+`docs/08-IMPLEMENTATION-GUIDE.md`.
 
 ```text
-chore: bootstrap .NET solution dan konfigurasi SQLite
+chore(m0): selesaikan bootstrap backend .NET 8 + SQLite
+
+- tambah .config/dotnet-tools.json (pin dotnet-ef 8.0.32 lokal)
+- samakan port launchSettings ke 5000 (http/https/iisExpress)
+- ganti DataKendaraan.Api.http dari template weatherforecast ke api/kendaraan
+- tandai checklist M0 selesai dan perbarui panduan implementasi
+- pulihkan format Markdown 04-TASKS.md yang rusak oleh formatter
+```
+
+Perintah (jalankan sendiri setelah review):
+
+**Git Bash:**
+
+```bash
+git add -A
+git status --short
+git commit -m "chore(m0): selesaikan bootstrap backend .NET 8 + SQLite" \
+  -m "- tambah .config/dotnet-tools.json (pin dotnet-ef 8.0.32 lokal)" \
+  -m "- samakan port launchSettings ke 5000 (http/https/iisExpress)" \
+  -m "- ganti DataKendaraan.Api.http dari template weatherforecast ke api/kendaraan" \
+  -m "- tandai checklist M0 selesai dan perbarui panduan implementasi" \
+  -m "- pulihkan format Markdown 04-TASKS.md yang rusak oleh formatter"
+```
+
+**PowerShell:**
+
+```powershell
+git add -A
+git status --short
+git commit -m "chore(m0): selesaikan bootstrap backend .NET 8 + SQLite" `
+  -m "- tambah .config/dotnet-tools.json (pin dotnet-ef 8.0.32 lokal)" `
+  -m "- samakan port launchSettings ke 5000 (http/https/iisExpress)" `
+  -m "- ganti DataKendaraan.Api.http dari template weatherforecast ke api/kendaraan" `
+  -m "- tandai checklist M0 selesai dan perbarui panduan implementasi" `
+  -m "- pulihkan format Markdown 04-TASKS.md yang rusak oleh formatter"
+```
+
+### C.2 — Urutan commit untuk milestone berikutnya
+
+```text
 feat(api): entity, dbcontext, seed, dan migration awal
 feat(api): endpoint CRUD kendaraan + validasi + CORS
 feat(web): halaman monitoring, filter, dan modal delete

@@ -9,22 +9,22 @@ Legend: `[ ]` belum · `[x]` selesai · `[~]` sedang dikerjakan
 
 ## M0 — Bootstrap Project
 
-- [ ] Buat solution & project
-      ```bash
-      mkdir backend && cd backend
-      dotnet new webapi -n DataKendaraan.Api -f net8.0
-      dotnet new sln -n DataKendaraan
-      dotnet sln add DataKendaraan.Api/DataKendaraan.Api.csproj
-      ```
-- [ ] Tambah paket
-      ```bash
-      dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Sqlite
-      dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Design
-      dotnet tool install --global dotnet-ef   # jika belum ada
-      ```
-- [ ] Buat folder: `Models/`, `Data/`, `Dtos/`, `Controllers/`
-- [ ] `.gitignore` (bin, obj, *.db, *.db-shm, *.db-wal)
-- [ ] `appsettings.Development.json` → `"ConnectionStrings": { "Default": "Data Source=kendaraan.db" }`
+- [x] Buat solution & project
+      `bash
+    mkdir backend && cd backend
+    dotnet new webapi -n DataKendaraan.Api -f net8.0
+    dotnet new sln -n DataKendaraan
+    dotnet sln add DataKendaraan.Api/DataKendaraan.Api.csproj
+    `
+- [x] Tambah paket
+      `bash
+    dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Sqlite
+    dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Design
+    dotnet tool install --global dotnet-ef   # jika belum ada
+    `
+- [x] Buat folder: `Models/`, `Data/`, `Dtos/`, `Controllers/`
+- [x] `.gitignore` (bin, obj, _.db, _.db-shm, \*.db-wal)
+- [x] `appsettings.Development.json` → `"ConnectionStrings": { "Default": "Data Source=kendaraan.db" }`
 
 **DoD M0:** `dotnet run` menyalakan server, `/swagger` terbuka.
 
@@ -49,23 +49,15 @@ Legend: `[ ]` belum · `[x]` selesai · `[~]` sedang dikerjakan
 Semua endpoint di bawah harus muncul di Swagger dan berfungsi lewat curl/Postman.
 
 - [ ] `KendaraanController` (route `api/kendaraan`)
-- [ ] `GET /api/kendaraan?noRegistrasi=&namaPemilik=`
-      - filter contains + case-insensitive (`EF.Functions.Like` atau `ToLower().Contains()`)
-      - kosong = semua data, urut `no_registrasi` ASC
-      - response `200` + `KendaraanDto[]`
-- [ ] `GET /api/kendaraan/{noRegistrasi}`
-      - `200` + dto · `404` jika tidak ada
-- [ ] `POST /api/kendaraan`
-      - `201 Created` + `Location` header + dto
-      - `400` validasi gagal · `409` duplikat PK
-- [ ] `PUT /api/kendaraan/{oldNoRegistrasi}`
-      - `200` + dto · `404` not found · `400` validasi · `409` jika newNoReg sudah dipakai record lain
-- [ ] `DELETE /api/kendaraan/{noRegistrasi}`
-      - `204 NoContent` · `404` not found
+- [ ] `GET /api/kendaraan?noRegistrasi=&namaPemilik=` - filter contains + case-insensitive (`EF.Functions.Like` atau `ToLower().Contains()`) - kosong = semua data, urut `no_registrasi` ASC - response `200` + `KendaraanDto[]`
+- [ ] `GET /api/kendaraan/{noRegistrasi}` - `200` + dto · `404` jika tidak ada
+- [ ] `POST /api/kendaraan` - `201 Created` + `Location` header + dto - `400` validasi gagal · `409` duplikat PK
+- [ ] `PUT /api/kendaraan/{oldNoRegistrasi}` - `200` + dto · `404` not found · `400` validasi · `409` jika newNoReg sudah dipakai record lain
+- [ ] `DELETE /api/kendaraan/{noRegistrasi}` - `204 NoContent` · `404` not found
 - [ ] Error response format seragam:
-      ```json
-      { "message": "Nomor registrasi sudah terdaftar.", "errors": { "noRegistrasi": ["..."] } }
-      ```
+      `json
+    { "message": "Nomor registrasi sudah terdaftar.", "errors": { "noRegistrasi": ["..."] } }
+    `
 - [ ] CORS policy `AllowFrontend` untuk origin `http://localhost:5500` (Live Server) & `http://127.0.0.1:5500`
 - [ ] Trim whitespace pada `noRegistrasi` & `namaPemilik` sebelum simpan
 - [ ] Normalisasi: `Warna` case-insensitive match ke opsi valid, atau tolak 400
@@ -77,12 +69,14 @@ Semua endpoint di bawah harus muncul di Swagger dan berfungsi lewat curl/Postman
 ## M3 — Frontend
 
 ### M3.1 Kerangka
+
 - [ ] `frontend/css/app.css` — CSS variable warna (§1 DESIGN), style header, filter panel, tabel, empty-state
 - [ ] `frontend/js/api.js` — `getList(filters)`, `getOne(id)`, `create(payload)`, `update(id, payload)`, `remove(id)`; base URL configurable (`const API_BASE = 'http://localhost:5000/api'`)
 - [ ] `frontend/js/toast.js` — `showToast(message, type)`
 - [ ] Skeleton `index.html` dengan header + container
 
 ### M3.2 Halaman Monitoring (`index.html` + `js/list.js`)
+
 - [ ] Panel filter: 2 input + tombol Search & Add (§2 DESIGN)
 - [ ] Render tabel 9 kolom dari `GET /api/kendaraan`
 - [ ] Format: `No` = index, `Kapasitas` = `{n} cc`, null → `-`
@@ -94,6 +88,7 @@ Semua endpoint di bawah harus muncul di Swagger dan berfungsi lewat curl/Postman
 - [ ] Baca `?status=created|updated|deleted` saat load → tampilkan toast lalu bersihkan query string (`history.replaceState`)
 
 ### M3.3 Form Tambah/Edit/Detail
+
 - [ ] Satu partial `form-kendaraan.html` (atau markup dibagi via JS template) dipakai 3 halaman
 - [ ] Mode ditentukan `?mode=tambah|edit|detail` + `?id=`
 - [ ] Layout 2 kolom sesuai urutan DESIGN §3
@@ -108,6 +103,7 @@ Semua endpoint di bawah harus muncul di Swagger dan berfungsi lewat curl/Postman
 - [ ] Tombol Kembali → `/index.html`
 
 ### M3.4 Polish
+
 - [ ] Responsif: tabel scroll horizontal < 992px, filter panel stack < 768px
 - [ ] `aria-label` pada tombol ikon, `<label for>` di semua input
 - [ ] Modal bisa ditutup Esc
@@ -120,28 +116,22 @@ Semua endpoint di bawah harus muncul di Swagger dan berfungsi lewat curl/Postman
 ## M4 — Testing
 
 - [ ] Smoke test manual untuk 12 skenario di bawah
-- [ ] Unit/integration test minimal untuk controller (xUnit + `WebApplicationFactory`):
-      - [ ] POST valid → 201
-      - [ ] POST duplikat → 409
-      - [ ] POST tanpa namaPemilik → 400
-      - [ ] PUT dengan PK baru yang sudah dipakai → 409
-      - [ ] DELETE id tidak ada → 404
-      - [ ] GET dengan filter nama (case-insensitive) → hasil sesuai
+- [ ] Unit/integration test minimal untuk controller (xUnit + `WebApplicationFactory`): - [ ] POST valid → 201 - [ ] POST duplikat → 409 - [ ] POST tanpa namaPemilik → 400 - [ ] PUT dengan PK baru yang sudah dipakai → 409 - [ ] DELETE id tidak ada → 404 - [ ] GET dengan filter nama (case-insensitive) → hasil sesuai
 
-| # | Skenario | Ekspektasi |
-|---|---|---|
-| 1 | Buka Monitoring | 5 baris seed tampil |
-| 2 | Search "b-" | semua baris B- tampil (case-insensitive) |
-| 3 | Search "messi" | 1 baris Lionel Messi |
-| 4 | Search "zzz" | pesan "Data kendaraan tidak ditemukan" |
-| 5 | Add data lengkap | redirect + toast sukses, data muncul |
-| 6 | Add tanpa Nama Pemilik | pesan wajib isi, tidak submit |
-| 7 | Add dengan No Reg yang sudah ada | pesan "Nomor registrasi sudah terdaftar." |
-| 8 | Edit tahun jadi "abc" | pesan tahun tidak valid |
-| 9 | Detail | semua field disabled, tanpa tombol Ubah |
-| 10 | Delete → Batal | modal tutup, data masih ada |
-| 11 | Delete → OK | modal tutup, baris hilang, toast sukses |
-| 12 | Restart server | data tetap ada (SQLite persisten) |
+| #   | Skenario                         | Ekspektasi                                |
+| --- | -------------------------------- | ----------------------------------------- |
+| 1   | Buka Monitoring                  | 5 baris seed tampil                       |
+| 2   | Search "b-"                      | semua baris B- tampil (case-insensitive)  |
+| 3   | Search "messi"                   | 1 baris Lionel Messi                      |
+| 4   | Search "zzz"                     | pesan "Data kendaraan tidak ditemukan"    |
+| 5   | Add data lengkap                 | redirect + toast sukses, data muncul      |
+| 6   | Add tanpa Nama Pemilik           | pesan wajib isi, tidak submit             |
+| 7   | Add dengan No Reg yang sudah ada | pesan "Nomor registrasi sudah terdaftar." |
+| 8   | Edit tahun jadi "abc"            | pesan tahun tidak valid                   |
+| 9   | Detail                           | semua field disabled, tanpa tombol Ubah   |
+| 10  | Delete → Batal                   | modal tutup, data masih ada               |
+| 11  | Delete → OK                      | modal tutup, baris hilang, toast sukses   |
+| 12  | Restart server                   | data tetap ada (SQLite persisten)         |
 
 **DoD M4:** Semua 12 skenario lulus + minimal 6 test otomatis hijau.
 
