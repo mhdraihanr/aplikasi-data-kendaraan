@@ -1,0 +1,18 @@
+# .NET
+bin/
+obj/
+*.user
+.vs/
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Frontend
+node_modules/
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
