@@ -135,7 +135,7 @@ Semua halaman memakai satu shell yang sama:
 - `thead th`: background `--table-head-bg`, teks `var(--text)`, bold, `text-align: left`, padding 10px 12px, `border-bottom: 2px solid var(--primary)`.
 - `tbody tr:nth-child(even)`: `#F7F9FC`.
 - `tbody tr:hover`: `#EDF3FB`.
-- Kolom `No` dan `Kapasitas` rata kanan; sisanya rata kiri.
+- Kolom `No` rata kanan; `Tahun Pembuatan` rata tengah; sisanya rata kiri.
 - Kolom `Action`: tiga link inline, dipisah spasi 12px.
   - `Detail` → `--warning`, `Edit` → `--primary`, `Delete` → `--danger`, semua `font-weight: 600`, `cursor:pointer`, tanpa underline default (underline saat hover).
 

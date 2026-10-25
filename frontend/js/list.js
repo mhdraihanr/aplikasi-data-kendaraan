@@ -26,12 +26,10 @@ function buatBaris(item, index) {
     buatSel(String(index + 1), "numeric"),
     buatSel(item.noRegistrasi, "registrasi"),
     buatSel(tampilkan(item.namaPemilik)),
-    buatSel(tampilkan(item.alamat)),
     buatSel(tampilkan(item.merkKendaraan)),
-    buatSel(tampilkan(item.tahunPembuatan)),
+    buatSel(tampilkan(item.tahunPembuatan), "center"),
     buatSel(
       item.kapasitasSilinder == null ? "-" : `${item.kapasitasSilinder} cc`,
-      "numeric",
     ),
     buatSel(tampilkan(item.warna)),
     buatSel(tampilkan(item.bahanBakar)),

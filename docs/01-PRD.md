@@ -59,15 +59,15 @@ Tidak paham teknis; butuh form yang jelas dan pesan error berbahasa Indonesia.
 
 **AC:**
 
-- [ ] Halaman Monitoring menampilkan tabel dengan kolom berurutan:
+- [x] Halaman Monitoring menampilkan tabel dengan kolom berurutan:
       `No | No Registrasi | Nama Pemilik | Merk Kendaraan | Tahun Pembuatan | Kapasitas | Warna | Bahan Bakar | Action`
-- [ ] Kolom **No** adalah nomor urut tampilan (1,2,3…), bukan PK.
-- [ ] Kolom **Kapasitas** ditampilkan dengan sufiks ` cc` (contoh `150 cc`).
-- [ ] Kolom **Action** berisi tiga tautan: `Detail` (oranye), `Edit` (biru), `Delete` (merah).
-- [ ] Jika tidak ada data, tampilkan baris kosong dengan teks "Data kendaraan tidak ditemukan".
-- [ ] Di atas tabel ada dua input filter: **No Registrasi** dan **Nama Pemilik**, serta tombol **Search** dan **Add**.
-- [ ] Judul halaman "Aplikasi Data Kendaraan" + ikon persegi biru di kiri atas.
-- [ ] Kolom **Alamat** sengaja TIDAK ditampilkan di tabel (hanya di form/detail).
+- [x] Kolom **No** adalah nomor urut tampilan (1,2,3…), bukan PK.
+- [x] Kolom **Kapasitas** ditampilkan dengan sufiks ` cc` (contoh `150 cc`).
+- [x] Kolom **Action** berisi tiga tautan: `Detail` (oranye), `Edit` (biru), `Delete` (merah).
+- [x] Jika tidak ada data, tampilkan baris kosong dengan teks "Data kendaraan tidak ditemukan".
+- [x] Di atas tabel ada dua input filter: **No Registrasi** dan **Nama Pemilik**, serta tombol **Search** dan **Add**.
+- [x] Judul halaman "Aplikasi Data Kendaraan" + ikon persegi biru di kiri atas.
+- [x] Kolom **Alamat** sengaja TIDAK ditampilkan di tabel (hanya di form/detail).
 
 ### US-2 — Mencari data kendaraan
 

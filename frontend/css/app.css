@@ -86,12 +86,14 @@ body {
 .filter-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 12px;
 }
 
 .filter-actions .btn {
-  min-width: 96px;
+  min-width: 128px;
+  padding: 10px 28px;
+  font-size: 16px;
 }
 
 .btn-primary {
@@ -137,6 +139,11 @@ body {
 .table td.numeric,
 .table th.numeric {
   text-align: right;
+}
+
+.table td.center,
+.table th.center {
+  text-align: center;
 }
 
 .table td.registrasi {
