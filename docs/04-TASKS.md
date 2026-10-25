@@ -10,18 +10,22 @@ Legend: `[ ]` belum · `[x]` selesai · `[~]` sedang dikerjakan
 ## M0 — Bootstrap Project
 
 - [x] Buat solution & project
-      `bash
-mkdir backend && cd backend
-dotnet new webapi -n DataKendaraan.Api -f net8.0
-dotnet new sln -n DataKendaraan
-dotnet sln add DataKendaraan.Api/DataKendaraan.Api.csproj
-`
+
+      ```bash
+      mkdir backend && cd backend
+      dotnet new webapi -n DataKendaraan.Api -f net8.0
+      dotnet new sln -n DataKendaraan
+      dotnet sln add DataKendaraan.Api/DataKendaraan.Api.csproj
+      ```
+
 - [x] Tambah paket
-      `bash
-dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Sqlite
-dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Design
-dotnet tool install --global dotnet-ef   # jika belum ada
-`
+
+      ```bash
+      dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Sqlite
+      dotnet add DataKendaraan.Api package Microsoft.EntityFrameworkCore.Design
+      dotnet tool install --global dotnet-ef
+      ```
+
 - [x] Buat folder: `Models/`, `Data/`, `Dtos/`, `Controllers/`
 - [x] `.gitignore` (bin, obj, _.db, _.db-shm, \*.db-wal)
 - [x] `appsettings.Development.json` → `"ConnectionStrings": { "Default": "Data Source=kendaraan.db" }`
@@ -48,19 +52,21 @@ dotnet tool install --global dotnet-ef   # jika belum ada
 
 Semua endpoint di bawah harus muncul di Swagger dan berfungsi lewat curl/Postman.
 
-- [ ] `KendaraanController` (route `api/kendaraan`)
-- [ ] `GET /api/kendaraan?noRegistrasi=&namaPemilik=` - filter contains + case-insensitive (`EF.Functions.Like` atau `ToLower().Contains()`) - kosong = semua data, urut `no_registrasi` ASC - response `200` + `KendaraanDto[]`
-- [ ] `GET /api/kendaraan/{noRegistrasi}` - `200` + dto · `404` jika tidak ada
-- [ ] `POST /api/kendaraan` - `201 Created` + `Location` header + dto - `400` validasi gagal · `409` duplikat PK
-- [ ] `PUT /api/kendaraan/{oldNoRegistrasi}` - `200` + dto · `404` not found · `400` validasi · `409` jika newNoReg sudah dipakai record lain
-- [ ] `DELETE /api/kendaraan/{noRegistrasi}` - `204 NoContent` · `404` not found
-- [ ] Error response format seragam:
-      `json
-{ "message": "Nomor registrasi sudah terdaftar.", "errors": { "noRegistrasi": ["..."] } }
-`
-- [ ] CORS policy `AllowFrontend` untuk origin `http://localhost:5500` (Live Server) & `http://127.0.0.1:5500`
-- [ ] Trim whitespace pada `noRegistrasi` & `namaPemilik` sebelum simpan
-- [ ] Normalisasi: `Warna` case-insensitive match ke opsi valid, atau tolak 400
+- [x] `KendaraanController` (route `api/kendaraan`)
+- [x] `GET /api/kendaraan?noRegistrasi=&namaPemilik=` - filter contains + case-insensitive (`EF.Functions.Like` atau `ToLower().Contains()`) - kosong = semua data, urut `no_registrasi` ASC - response `200` + `KendaraanDto[]`
+- [x] `GET /api/kendaraan/{noRegistrasi}` - `200` + dto · `404` jika tidak ada
+- [x] `POST /api/kendaraan` - `201 Created` + `Location` header + dto - `400` validasi gagal · `409` duplikat PK
+- [x] `PUT /api/kendaraan/{oldNoRegistrasi}` - `200` + dto · `404` not found · `400` validasi · `409` jika newNoReg sudah dipakai record lain
+- [x] `DELETE /api/kendaraan/{noRegistrasi}` - `204 NoContent` · `404` not found
+- [x] Error response format seragam:
+
+      ```json
+      { "message": "Nomor registrasi sudah terdaftar.", "errors": { "noRegistrasi": ["..."] } }
+      ```
+
+- [x] CORS policy `AllowFrontend` untuk origin `http://localhost:5500` (Live Server) & `http://127.0.0.1:5500`
+- [x] Trim whitespace pada `noRegistrasi` & `namaPemilik` sebelum simpan
+- [x] Normalisasi: `Warna` case-insensitive match ke opsi valid, atau tolak 400
 
 **DoD M2:** Semua endpoint lulus smoke test manual (lihat M4 test cases).
 

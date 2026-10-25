@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using DataKendaraan.Api.Validation;
 
 namespace DataKendaraan.Api.Dtos;
 
@@ -18,14 +19,13 @@ public class KendaraanRequest
     [MaxLength(100, ErrorMessage = "Merk Kendaraan maksimal 100 karakter.")]
     public string? MerkKendaraan { get; set; }
 
-    [Range(1900, 2100, ErrorMessage = "Tahun Pembuatan harus antara 1900 dan 2100.")]
+    [TahunPembuatan]
     public int? TahunPembuatan { get; set; }
 
     [Range(1, int.MaxValue, ErrorMessage = "Kapasitas Silinder harus lebih dari 0.")]
     public int? KapasitasSilinder { get; set; }
 
-    [RegularExpression(@"(?i)^\s*(Merah|Hitam|Biru|Abu-Abu)?\s*$",
-        ErrorMessage = "Warna Kendaraan tidak valid.")]
+    [WarnaKendaraan]
     public string? Warna { get; set; }
 
     [MaxLength(50, ErrorMessage = "Bahan Bakar maksimal 50 karakter.")]
