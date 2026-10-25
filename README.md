@@ -19,10 +19,9 @@ belum. Lihat [`docs/04-TASKS.md`](docs/04-TASKS.md) untuk progres terbaru.
 | 04  | [`docs/04-TASKS.md`](docs/04-TASKS.md)                               | Checklist milestone M0–M5 + test case                                    | Mau **mulai implementasi**                    |
 | 05  | [`docs/05-BUSINESS-RULES.md`](docs/05-BUSINESS-RULES.md)             | 15 aturan bisnis bernomor (BR-01…BR-15): validasi, PK, pencarian, delete | Butuh tahu **perilaku detail di balik layar** |
 | 06  | [`docs/06-API-CONTRACT.md`](docs/06-API-CONTRACT.md)                 | Endpoint, request/response JSON, status code                             | Butuh **menghubungkan frontend ↔ backend**    |
-| 07  | [`docs/07-DECISIONS.md`](docs/07-DECISIONS.md)                       | Semua ambiguitas dokumen asli + keputusannya                             | **Ragu soal requirement** (baca dulu!)        |
 | 08  | [`docs/08-IMPLEMENTATION-GUIDE.md`](docs/08-IMPLEMENTATION-GUIDE.md) | Panduan langkah per milestone + verifikasi + jebakan umum                | **Mulai coding step-by-step**                 |
 
-**Alur baca yang disarankan:** `07-DECISIONS` → `01-PRD` → `05-BUSINESS-RULES`
+**Alur baca yang disarankan:** `01-PRD` → `05-BUSINESS-RULES`
 → `03-DATA-MODEL` → `06-API-CONTRACT` → `02-DESIGN` → `04-TASKS` →
 `08-IMPLEMENTATION-GUIDE` (saat mulai coding).
 
@@ -56,8 +55,10 @@ belum. Lihat [`docs/04-TASKS.md`](docs/04-TASKS.md) untuk progres terbaru.
 | Warna Kendaraan            | Dropdown: Merah / Hitam / Biru / Abu-Abu | —     |
 | Bahan Bakar                | Text (contoh: Bensin)                    | —     |
 
-> ⚠️ Dua hal di dokumen asli tertukar (Bahan Bakar berisi nama warna, Warna
-> tertulis "Text"). Lihat [`docs/07-DECISIONS.md`](docs/07-DECISIONS.md) D-01 & D-02.
+> ⚠️ Dua hal di dokumen asli tertukar: tabel requirement menaruh nama warna di
+> field Bahan Bakar, dan menulis Warna sebagai "Text". Yang dipakai di aplikasi
+> ini mengikuti mockup — **Warna = dropdown** `Merah / Hitam / Biru / Abu-Abu`,
+> **Bahan Bakar = teks bebas** (contoh: `Bensin`).
 
 ---
 
@@ -110,7 +111,6 @@ aplikasi-data-kendaraan/
 │   ├── 04-TASKS.md
 │   ├── 05-BUSINESS-RULES.md
 │   ├── 06-API-CONTRACT.md
-│   ├── 07-DECISIONS.md
 │   ├── 08-IMPLEMENTATION-GUIDE.md
 │   ├── source/                 ← PDF asli
 │   └── screenshots/            ← mockup hasil render

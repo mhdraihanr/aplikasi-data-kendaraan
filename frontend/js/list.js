@@ -45,20 +45,29 @@ function buatBaris(item, index) {
   detail.className = "action-detail";
   detail.href = `form.html?mode=detail&id=${encodeURIComponent(item.noRegistrasi)}`;
   detail.textContent = "Detail";
+  detail.setAttribute("aria-label", `Detail data ${item.noRegistrasi}`);
 
   const edit = document.createElement("a");
   edit.className = "action-edit";
   edit.href = `form.html?mode=edit&id=${encodeURIComponent(item.noRegistrasi)}`;
   edit.textContent = "Edit";
+  edit.setAttribute("aria-label", `Edit data ${item.noRegistrasi}`);
 
   const hapus = document.createElement("a");
   hapus.className = "action-delete";
   hapus.href = "#";
   hapus.textContent = "Delete";
   hapus.setAttribute("role", "button");
+  hapus.setAttribute("aria-label", `Hapus data ${item.noRegistrasi}`);
   hapus.addEventListener("click", (event) => {
     event.preventDefault();
     bukaModalHapus(item.noRegistrasi);
+  });
+  hapus.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      bukaModalHapus(item.noRegistrasi);
+    }
   });
 
   grup.append(detail, edit, hapus);

@@ -59,8 +59,9 @@ Hanya dua field yang wajib: **No Registrasi Kendaraan** dan **Nama Pemilik**.
 - Tidak ada batas atas buatan (motor 125 cc sampai truk > 10.000 cc valid).
 - Nilai bulat; input desimal (`150.5`) ditolak, bukan dibulatkan.
 
-> Lihat `docs/07-DECISIONS.md` D-03: maxlength 4 di dokumen asli **tidak**
-> berlaku untuk field ini.
+> Catatan: "maxlength 4" di dokumen asli menempel ke Tahun Pembuatan, **tidak**
+> berlaku untuk Kapasitas Silinder. Tabel PDF meleset satu baris saat ekstraksi;
+> membatasi kapasitas 4 digit akan memotong nilai sah seperti 1250 cc.
 
 ## BR-06 — Warna Kendaraan (Enumerasi)
 
@@ -78,8 +79,8 @@ Hanya dua field yang wajib: **No Registrasi Kendaraan** dan **Nama Pemilik**.
 - `bahanBakar` adalah teks bebas maksimal 50 karakter, **bukan** enumerasi.
 - Data contoh memakai `Bensin`; nilai lain (`Solar`, `Diesel`, `Listrik`, `Pertalite`)
   tetap sah.
-- **Tidak boleh** divalidasi terhadap daftar warna — itu kesalahan dokumen asli
-  (lihat `docs/07-DECISIONS.md` D-01).
+- **Tidak boleh** divalidasi terhadap daftar warna — itu kesalahan dokumen asli,
+  yang menukar isi field Warna dengan field Bahan Bakar.
 
 ## BR-08 — Mengubah Primary Key
 

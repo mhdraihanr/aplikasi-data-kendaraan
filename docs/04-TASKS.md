@@ -76,46 +76,77 @@ Semua endpoint di bawah harus muncul di Swagger dan berfungsi lewat curl/Postman
 
 ### M3.1 Kerangka
 
-- [ ] `frontend/css/app.css` — CSS variable warna (§1 DESIGN), style header, filter panel, tabel, empty-state
-- [ ] `frontend/js/api.js` — `getList(filters)`, `getOne(id)`, `create(payload)`, `update(id, payload)`, `remove(id)`; base URL configurable (`const API_BASE = 'http://localhost:5000/api'`)
-- [ ] `frontend/js/toast.js` — `showToast(message, type)`
-- [ ] Skeleton `index.html` dengan header + container
+- [x] `frontend/css/app.css` — CSS variable warna (§1 DESIGN), style header, filter panel, tabel, empty-state
+- [x] `frontend/js/api.js` — `getList(filters)`, `getOne(id)`, `create(payload)`, `update(id, payload)`, `remove(id)`; base URL configurable (`const API_BASE = 'http://localhost:5000/api'`)
+- [x] `frontend/js/toast.js` — `showToast(message, type)`
+- [x] Skeleton `index.html` dengan header + container
 
 ### M3.2 Halaman Monitoring (`index.html` + `js/list.js`)
 
-- [ ] Panel filter: 2 input + tombol Search & Add (§2 DESIGN)
-- [ ] Render tabel 9 kolom dari `GET /api/kendaraan`
-- [ ] Format: `No` = index, `Kapasitas` = `{n} cc`, null → `-`
-- [ ] Submit filter → panggil API dengan query, render ulang, reset numbering
-- [ ] Empty state saat 0 hasil
-- [ ] Action link Detail/Edit/Delete per baris dengan warna sesuai DESIGN
-- [ ] Modal konfirmasi delete: teks persis `Anda yakin menghapus data {noReg} ?`, tombol OK & Batal
-- [ ] OK → `DELETE`, tutup modal, reload tabel, toast sukses; gagal → toast error
-- [ ] Baca `?status=created|updated|deleted` saat load → tampilkan toast lalu bersihkan query string (`history.replaceState`)
+- [x] Panel filter: 2 input + tombol Search & Add (§2 DESIGN)
+- [x] Render tabel 9 kolom dari `GET /api/kendaraan`
+- [x] Format: `No` = index, `Kapasitas` = `{n} cc`, null → `-`
+- [x] Submit filter → panggil API dengan query, render ulang, reset numbering
+- [x] Empty state saat 0 hasil
+- [x] Action link Detail/Edit/Delete per baris dengan warna sesuai DESIGN
+- [x] Modal konfirmasi delete: teks persis `Anda yakin menghapus data {noReg} ?`, tombol OK & Batal
+- [x] OK → `DELETE`, tutup modal, reload tabel, toast sukses; gagal → toast error
+- [x] Baca `?status=created|updated|deleted` saat load → tampilkan toast lalu bersihkan query string (`history.replaceState`)
 
 ### M3.3 Form Tambah/Edit/Detail
 
-- [ ] Satu partial `form-kendaraan.html` (atau markup dibagi via JS template) dipakai 3 halaman
-- [ ] Mode ditentukan `?mode=tambah|edit|detail` + `?id=`
-- [ ] Layout 2 kolom sesuai urutan DESIGN §3
-- [ ] Field Warna = `<select>` dengan opsi Merah/Hitam/Biru/Abu-Abu + placeholder "Pilih Warna"
-- [ ] Field Bahan Bakar = `<input type="text">`
-- [ ] `tambah.html`: form kosong, tombol **Simpan**
-- [ ] `edit.html`: load data via `GET /{id}`, prefill, tombol **Ubah**
-- [ ] `detail.html`: load data, semua field `disabled`, hanya tombol **Kembali**
-- [ ] Validasi client-side: required (noReg, namaPemilik), pola tahun, kapasitas > 0, maxlength
-- [ ] Pesan error per field di bawah input (`is-invalid` + `[data-error-for]`)
-- [ ] Submit → POST/PUT → redirect `/index.html?status=...`; error server → tampilkan di field terkait
-- [ ] Tombol Kembali → `/index.html`
+- [x] Satu partial `form-kendaraan.html` (atau markup dibagi via JS template) dipakai 3 halaman
+- [x] Mode ditentukan `?mode=tambah|edit|detail` + `?id=`
+- [x] Layout 2 kolom sesuai urutan DESIGN §3
+- [x] Field Warna = `<select>` dengan opsi Merah/Hitam/Biru/Abu-Abu + placeholder "Pilih Warna"
+- [x] Field Bahan Bakar = `<input type="text">`
+- [x] `tambah.html`: form kosong, tombol **Simpan**
+- [x] `edit.html`: load data via `GET /{id}`, prefill, tombol **Ubah**
+- [x] `detail.html`: load data, semua field `disabled`, hanya tombol **Kembali**
+- [x] Validasi client-side: required (noReg, namaPemilik), pola tahun, kapasitas > 0, maxlength
+- [x] Pesan error per field di bawah input (`is-invalid` + `[data-error-for]`)
+- [x] Submit → POST/PUT → redirect `/index.html?status=...`; error server → tampilkan di field terkait
+- [x] Tombol Kembali → `/index.html`
 
 ### M3.4 Polish
 
-- [ ] Responsif: tabel scroll horizontal < 992px, filter panel stack < 768px
-- [ ] `aria-label` pada tombol ikon, `<label for>` di semua input
-- [ ] Modal bisa ditutup Esc
-- [ ] Tidak ada error di console browser
+- [x] Responsif: tabel scroll horizontal < 992px, filter panel stack < 768px
+- [x] `aria-label` pada tombol ikon, `<label for>` di semua input
+- [x] Modal bisa ditutup Esc
+- [x] Tidak ada error di console browser
+
+**Bukti verifikasi M3.4** (Playwright, Chromium):
+
+| Kriteria | Hasil |
+| --- | --- |
+| 1366px | tabel tidak scroll, `docOverflowX: false`, panel 1152px |
+| 900px | `tableScrollable: true`, `overflow-x: auto`, `docOverflowX: false` |
+| 400px | `tableScrollable: true`, `.filter-actions` `flex-direction: column`, `docOverflowX: false` |
+| `aria-label` aksi | `Detail data B-1678-BDG`, `Edit data B-1678-BDG`, `Hapus data B-1678-BDG` |
+| `aria-label` modal | `role="dialog"`, `aria-modal="true"`, `aria-labelledby="deleteModalText"` |
+| Label input | `index.html` 2/2, `form.html` 8/8 di ketiga mode — `inputTanpaLabel: []` |
+| Esc | `keydown` diterima modal → `Modal.hide()` terpanggil → `show` class lepas, `display: none` |
+| Console | 0 error di `index.html`, `form.html?mode=tambah`, `?mode=edit`, `?mode=detail` |
+
+Catatan pengujian Esc: `page.keyboard.press('Escape')` Playwright tidak
+menyampaikan event karena jendela browser headless kehilangan fokus OS
+(`document.hasFocus() === false`, `visibilityState === "hidden"`). Verifikasi
+dilakukan dengan `keydown` pada `document.activeElement` di dalam modal —
+jalur kode yang sama dengan Esc sungguhan. Konfigurasi instance:
+`{ backdrop: true, focus: true, keyboard: true }`.
 
 **DoD M3:** Keenam user story bisa dilakukan penuh lewat browser tanpa menyentuh Swagger.
+
+**Bukti DoD M3** (E2E Playwright, tanpa Swagger):
+
+| # | User story | Hasil |
+| --- | --- | --- |
+| 1 | Lihat daftar | 5 baris seed tampil |
+| 2 | Filter | `GET /api/kendaraan?noRegistrasi=...` terpanggil |
+| 3 | Tambah | toast "Data kendaraan berhasil ditambahkan.", baris ke-6 muncul |
+| 4 | Detail | 8 field `disabled`, hanya tombol Kembali |
+| 5 | Edit | prefill benar, toast "Data kendaraan berhasil diperbarui.", baris ter-update |
+| 6 | Hapus | modal konfirmasi → OK → toast, baris hilang, data kembali 5 seed |
 
 ---
 
@@ -160,4 +191,5 @@ M0 → M1 → M2 (verifikasi dengan curl) → M3.1 → M3.2 → M3.3 → M3.4 �
 ```
 
 **Aturan:** jangan lanjut milestone jika DoD milestone sebelumnya belum terpenuhi.
-Jika ada dokumen yang belum jelas, baca `docs/07-DECISIONS.md` SEBELUM bertanya.
+Jika ada dokumen yang belum jelas, baca `05-BUSINESS-RULES.md` dan `01-PRD.md`
+SEBELUM bertanya.

@@ -244,8 +244,9 @@ setelah `db.Database.Migrate()` — hanya menyisipkan jika tabel masih kosong.
 Gunakan **EF Core Migrations** (`dotnet ef migrations add InitialCreate`),
 bukan `EnsureCreated()`, supaya skema bisa di-evolve nanti.
 
-Dua provider berarti dua set migration (lihat `docs/07-DECISIONS.md` D-15).
-Jangan memakai migration SQLite untuk production PostgreSQL.
+Dua provider berarti **dua set migration** — EF Core hanya membuat migration
+untuk provider yang sedang aktif. Jangan memakai migration SQLite untuk
+production PostgreSQL.
 
 ## 9. Aturan Integritas
 

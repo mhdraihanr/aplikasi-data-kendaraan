@@ -163,8 +163,8 @@ Tidak paham teknis; butuh form yang jelas dan pesan error berbahasa Indonesia.
 | 7   | Warna Kendaraan            | Warna Kendaraan          | `<select>`              | ❌ Tidak | opsi: `Merah, Hitam, Biru, Abu-Abu`  |
 | 8   | Bahan Bakar                | Bahan Bakar              | `<input type="text">`   | ❌ Tidak | maks 50 char                         |
 
-> **Catatan keputusan:** Lihat `docs/07-DECISIONS.md` untuk alasan Warna = dropdown
-> dan Bahan Bakar = text (mengikuti mockup, bukan tabel requirement yang keliru).
+> **Catatan keputusan:** Warna = dropdown dan Bahan Bakar = text input mengikuti
+> mockup, bukan tabel requirement yang keliru (tabel itu menukar keduanya).
 
 ## 6. Non-Functional Requirements
 
