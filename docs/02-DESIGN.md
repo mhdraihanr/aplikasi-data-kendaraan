@@ -29,17 +29,19 @@ Semua halaman memakai satu shell yang sama:
 - **Warna brand**
   | Token | Hex | Pemakaian |
   |---|---|---|
-  | `--primary` | `#2F6FB5` | tombol utama, header tabel |
+  | `--primary` | `#2F6FB5` | tombol utama, garis bawah header tabel |
   | `--primary-hover` | `#255A94` | hover tombol |
   | `--panel-bg` | `#FBEBDD` | panel filter (krem) |
-  | `--secondary` | `#9AA0A6` | tombol Kembali |
-  | `--danger` | `#D9363E` | tautan Delete |
-  | `--warning` | `#E08A2B` | tautan Detail |
+  | `--table-head-bg` | `#DCE9F7` | latar header tabel (teks hitam) |
+  | `--secondary` | `#5F6368` | tombol Kembali |
+  | `--secondary-hover` | `#4B5563` | hover tombol Kembali |
+  | `--danger` | `#C1121F` | tautan Delete |
+  | `--warning` | `#B45309` | tautan Detail |
   | `--text` | `#1a1a1a` | teks utama |
   | `--muted` | `#6B7280` | placeholder / label sekunder |
   | `--border` | `#D6D6D6` | border input & card |
   | `--success` | `#1E874B` | notifikasi sukses |
-  | `--error` | `#D9363E` | pesan validasi |
+  | `--error` | `#C1121F` | pesan validasi |
 
 ## 2. Halaman Monitoring (F1, F2, F6)
 
@@ -77,15 +79,29 @@ Semua halaman memakai satu shell yang sama:
     <div class="filter-fields">
       <div class="mb-3">
         <label for="filterNoRegistrasi" class="form-label">No Registrasi</label>
-        <input type="text" class="form-control" id="filterNoRegistrasi" name="noRegistrasi" maxlength="20">
+        <input
+          type="text"
+          class="form-control"
+          id="filterNoRegistrasi"
+          name="noRegistrasi"
+          maxlength="20"
+        />
       </div>
       <div class="mb-3">
         <label for="filterNamaPemilik" class="form-label">Nama Pemilik</label>
-        <input type="text" class="form-control" id="filterNamaPemilik" name="namaPemilik" maxlength="100">
+        <input
+          type="text"
+          class="form-control"
+          id="filterNamaPemilik"
+          name="namaPemilik"
+          maxlength="100"
+        />
       </div>
     </div>
     <div class="filter-actions">
-      <button type="submit" class="btn btn-primary" id="btnSearch">Search</button>
+      <button type="submit" class="btn btn-primary" id="btnSearch">
+        Search
+      </button>
       <a href="/tambah.html" class="btn btn-primary" id="btnAdd">Add</a>
     </div>
   </form>
@@ -94,29 +110,41 @@ Semua halaman memakai satu shell yang sama:
     <table class="table table-bordered align-middle" id="vehicleTable">
       <thead>
         <tr>
-          <th>No</th><th>No Registrasi</th><th>Nama Pemilik</th><th>Merk Kendaraan</th>
-          <th>Tahun Pembuatan</th><th>Kapasitas</th><th>Warna</th><th>Bahan Bakar</th><th>Action</th>
+          <th>No</th>
+          <th>No Registrasi</th>
+          <th>Nama Pemilik</th>
+          <th>Merk Kendaraan</th>
+          <th>Tahun Pembuatan</th>
+          <th>Kapasitas</th>
+          <th>Warna</th>
+          <th>Bahan Bakar</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody id="vehicleTableBody"></tbody>
     </table>
   </div>
-  <div id="emptyState" class="empty-state d-none">Data kendaraan tidak ditemukan</div>
+  <div id="emptyState" class="empty-state d-none">
+    Data kendaraan tidak ditemukan
+  </div>
 </div>
 ```
 
 ### Gaya tabel
-- `thead th`: background `--primary`, teks putih, bold, `text-align: left`, padding 10px 12px.
+
+- `thead th`: background `--table-head-bg`, teks `var(--text)`, bold, `text-align: left`, padding 10px 12px, `border-bottom: 2px solid var(--primary)`.
 - `tbody tr:nth-child(even)`: `#F7F9FC`.
 - `tbody tr:hover`: `#EDF3FB`.
 - Kolom `No` dan `Kapasitas` rata kanan; sisanya rata kiri.
 - Kolom `Action`: tiga link inline, dipisah spasi 12px.
-  - `Detail` → `--warning`, `Edit` → `--primary`, `Delete` → `--danger`, semua `cursor:pointer`, tanpa underline default (underline saat hover).
+  - `Detail` → `--warning`, `Edit` → `--primary`, `Delete` → `--danger`, semua `font-weight: 600`, `cursor:pointer`, tanpa underline default (underline saat hover).
 
 ### Panel filter
+
 - Background `--panel-bg`, border-radius 6px, padding 16px 20px, margin-bottom 20px.
-- Input dan tombol disusun: input menumpuk vertikal di kiri (maks 360px),
-  tombol `Search` + `Add` sejajar di kanan bawah panel (sticky ke kanan).
+- Input menumpuk vertikal di kiri (maks 360px).
+- Tombol `Search` + `Add` **di luar panel krem**, tepat di atas tabel,
+  sejajar kanan (`justify-content: flex-end`), margin-bottom 12px.
 - Di lebar < 768px, tombol pindah ke bawah input full-width.
 
 ## 3. Halaman Tambah Data (F2)
@@ -142,6 +170,7 @@ Semua halaman memakai satu shell yang sama:
 ```
 
 ### Spesifikasi form
+
 - Layout: `row` + `col-md-6` per field, urutan DOM **Kiri lalu Kanan**
   (row1: NoReg, Tahun → row2: Nama, Kapasitas → row3: Merk, Warna →
   row4: Alamat, Bahan Bakar). Ini sama dengan urutan visual mockup.
@@ -161,8 +190,15 @@ Semua halaman memakai satu shell yang sama:
   <label for="noRegistrasi" class="form-label">
     No. Registrasi Kendaraan <span class="text-danger">*</span>
   </label>
-  <input type="text" class="form-control" id="noRegistrasi" name="noRegistrasi"
-         maxlength="20" required autocomplete="off">
+  <input
+    type="text"
+    class="form-control"
+    id="noRegistrasi"
+    name="noRegistrasi"
+    maxlength="20"
+    required
+    autocomplete="off"
+  />
   <div class="form-text text-danger d-none" data-error-for="noRegistrasi"></div>
 </div>
 ```
@@ -184,20 +220,21 @@ Semua halaman memakai satu shell yang sama:
 
 Struktur **identik** dengan halaman Tambah. Perbedaannya:
 
-| Aspek | Tambah | Edit | Detail |
-|---|---|---|---|
-| Judul `h2` | Tambah Data Kendaraan | Edit Data Kendaraan | Detail Data Kendaraan |
-| URL | `/tambah.html` | `/edit.html?id={noReg}` | `/detail.html?id={noReg}` |
-| Field | kosong | terisi | terisi, **disabled** |
-| Tombol primary | **Simpan** | **Ubah** | — |
-| Tombol secondary | Kembali | Kembali | Kembali |
-| No. Registrasi | editable | editable (update PK, lihat BR-6.3) | disabled |
+| Aspek            | Tambah                | Edit                               | Detail                    |
+| ---------------- | --------------------- | ---------------------------------- | ------------------------- |
+| Judul `h2`       | Tambah Data Kendaraan | Edit Data Kendaraan                | Detail Data Kendaraan     |
+| URL              | `/tambah.html`        | `/edit.html?id={noReg}`            | `/detail.html?id={noReg}` |
+| Field            | kosong                | terisi                             | terisi, **disabled**      |
+| Tombol primary   | **Simpan**            | **Ubah**                           | —                         |
+| Tombol secondary | Kembali               | Kembali                            | Kembali                   |
+| No. Registrasi   | editable              | editable (update PK, lihat BR-6.3) | disabled                  |
 
 > Satu partial HTML `form-kendaraan.html` boleh dipakai ulang oleh ketiga
 > halaman; mode dikontrol lewat query string `?mode=tambah|edit|detail`.
 > Ini menghindari duplikasi markup 3×.
 
 Gaya detail read-only:
+
 - Input `disabled` **plus** class `.form-control-plaintext` atau
   `style="background:#F5F6F8; color:var(--text)"` agar teks tetap hitam,
   bukan abu pucat, dan `cursor: not-allowed`.
@@ -231,17 +268,17 @@ Gaya detail read-only:
 
 ## 7. Pesan Validasi (Bahasa Indonesia)
 
-| Kondisi | Pesan |
-|---|---|
-| No Registrasi kosong | No. Registrasi Kendaraan wajib diisi. |
-| Nama Pemilik kosong | Nama Pemilik wajib diisi. |
-| No Registrasi duplikat (409) | Nomor registrasi sudah terdaftar. |
+| Kondisi                                     | Pesan                                                          |
+| ------------------------------------------- | -------------------------------------------------------------- |
+| No Registrasi kosong                        | No. Registrasi Kendaraan wajib diisi.                          |
+| Nama Pemilik kosong                         | Nama Pemilik wajib diisi.                                      |
+| No Registrasi duplikat (409)                | Nomor registrasi sudah terdaftar.                              |
 | Tahun bukan angka / <1900 / >tahun berjalan | Tahun Pembuatan harus berupa angka antara 1900 dan {tahunIni}. |
-| Kapasitas bukan angka / ≤ 0 | Kapasitas Silinder harus berupa angka lebih dari 0. |
-| Alamat > 255 char | Alamat maksimal 255 karakter. |
-| Field lain > batas char | {Label} maksimal {n} karakter. |
-| Gagal koneksi ke server | Tidak dapat terhubung ke server. Silakan coba lagi. |
-| Error tak terduga | Terjadi kesalahan. Silakan coba lagi. |
+| Kapasitas bukan angka / ≤ 0                 | Kapasitas Silinder harus berupa angka lebih dari 0.            |
+| Alamat > 255 char                           | Alamat maksimal 255 karakter.                                  |
+| Field lain > batas char                     | {Label} maksimal {n} karakter.                                 |
+| Gagal koneksi ke server                     | Tidak dapat terhubung ke server. Silakan coba lagi.            |
+| Error tak terduga                           | Terjadi kesalahan. Silakan coba lagi.                          |
 
 Aturan tampilan: pesan muncul di bawah field sebagai teks merah 13px,
 input bersangkutan diberi `class="is-invalid"` (border merah).
@@ -249,29 +286,29 @@ Validasi dijalankan saat blur dan saat submit; pesan hilang saat user mengetik.
 
 ## 8. State & Interaksi Tabel
 
-| Event | Perilaku |
-|---|---|
-| Halaman load | `GET /api/kendaraan` tanpa filter → render tabel |
-| Klik Search | `GET /api/kendaraan?noRegistrasi=..&namaPemilik=..` → render ulang |
-| Enter di input filter | sama dengan klik Search (form submit) |
-| 0 hasil | sembunyikan tabel, tampilkan `#emptyState` |
-| Klik Delete | isi `#deleteModalText` dengan noReg baris → `modal.show()` |
-| Klik Detail / Edit | `window.location = /detail.html?id=..` / `/edit.html?id=..` |
-| Request gagal | toast error, tabel tetap seperti sebelumnya |
+| Event                 | Perilaku                                                           |
+| --------------------- | ------------------------------------------------------------------ |
+| Halaman load          | `GET /api/kendaraan` tanpa filter → render tabel                   |
+| Klik Search           | `GET /api/kendaraan?noRegistrasi=..&namaPemilik=..` → render ulang |
+| Enter di input filter | sama dengan klik Search (form submit)                              |
+| 0 hasil               | sembunyikan tabel, tampilkan `#emptyState`                         |
+| Klik Delete           | isi `#deleteModalText` dengan noReg baris → `modal.show()`         |
+| Klik Detail / Edit    | `window.location = /detail.html?id=..` / `/edit.html?id=..`        |
+| Request gagal         | toast error, tabel tetap seperti sebelumnya                        |
 
 ## 9. Format Tampilan Data Tabel
 
-| Kolom | Sumber | Format |
-|---|---|---|
-| No | index | `i + 1` |
-| No Registrasi | `noRegistrasi` | apa adanya, `font-weight:600` |
-| Nama Pemilik | `namaPemilik` | apa adanya |
-| Merk Kendaraan | `merkKendaraan` | apa adanya |
-| Tahun Pembuatan | `tahunPembuatan` | apa adanya (4 digit) |
-| Kapasitas | `kapasitasSilinder` | `{n} cc` |
-| Warna | `warna` | apa adanya |
-| Bahan Bakar | `bahanBakar` | apa adanya |
-| Action | — | 3 link |
+| Kolom           | Sumber              | Format                        |
+| --------------- | ------------------- | ----------------------------- |
+| No              | index               | `i + 1`                       |
+| No Registrasi   | `noRegistrasi`      | apa adanya, `font-weight:600` |
+| Nama Pemilik    | `namaPemilik`       | apa adanya                    |
+| Merk Kendaraan  | `merkKendaraan`     | apa adanya                    |
+| Tahun Pembuatan | `tahunPembuatan`    | apa adanya (4 digit)          |
+| Kapasitas       | `kapasitasSilinder` | `{n} cc`                      |
+| Warna           | `warna`             | apa adanya                    |
+| Bahan Bakar     | `bahanBakar`        | apa adanya                    |
+| Action          | —                   | 3 link                        |
 
 Nilai kosong/null ditampilkan sebagai `-` (dash), bukan "null" atau "undefined".
 
