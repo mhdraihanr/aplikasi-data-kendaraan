@@ -13,7 +13,7 @@ builder.Services.AddControllers()
             var errors = context.ModelState
                 .Where(entry => entry.Value?.Errors.Count > 0)
                 .ToDictionary(
-                    entry => entry.Key,
+                    entry => ToCamelCase(entry.Key),
                     entry => entry.Value!.Errors
                         .Select(error => string.IsNullOrEmpty(error.ErrorMessage)
                             ? "Nilai tidak valid."
@@ -21,6 +21,11 @@ builder.Services.AddControllers()
                         .ToArray());
 
             return new BadRequestObjectResult(new ApiError("Data tidak valid.", errors));
+
+            static string ToCamelCase(string name) =>
+                string.IsNullOrEmpty(name)
+                    ? name
+                    : char.ToLowerInvariant(name[0]) + name[1..];
         };
     });
 builder.Services.AddEndpointsApiExplorer();

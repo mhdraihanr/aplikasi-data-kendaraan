@@ -1,13 +1,3 @@
-const PESAN = {
-  hapusSukses: "Data kendaraan berhasil dihapus.",
-  hapusGagal: "Gagal menghapus data kendaraan.",
-  muatGagal: "Gagal memuat data kendaraan.",
-  created: "Data kendaraan berhasil ditambahkan.",
-  updated: "Data kendaraan berhasil diperbarui.",
-};
-
-PESAN.deleted = PESAN.hapusSukses;
-
 const kendaraanBody = document.getElementById("kendaraanBody");
 const emptyState = document.getElementById("emptyState");
 const kendaraanTable = document.getElementById("kendaraanTable");
@@ -53,12 +43,12 @@ function buatBaris(item, index) {
 
   const detail = document.createElement("a");
   detail.className = "action-detail";
-  detail.href = `detail.html?id=${encodeURIComponent(item.noRegistrasi)}`;
+  detail.href = `form.html?mode=detail&id=${encodeURIComponent(item.noRegistrasi)}`;
   detail.textContent = "Detail";
 
   const edit = document.createElement("a");
   edit.className = "action-edit";
-  edit.href = `edit.html?id=${encodeURIComponent(item.noRegistrasi)}`;
+  edit.href = `form.html?mode=edit&id=${encodeURIComponent(item.noRegistrasi)}`;
   edit.textContent = "Edit";
 
   const hapus = document.createElement("a");
@@ -135,9 +125,9 @@ async function konfirmasiHapus() {
 function bacaStatus() {
   const status = new URLSearchParams(window.location.search).get("status");
   const pesan = {
-    created: PESAN.created,
-    updated: PESAN.updated,
-    deleted: PESAN.deleted,
+    created: PESAN.simpanSukses,
+    updated: PESAN.ubahSukses,
+    deleted: PESAN.hapusSukses,
   };
 
   if (!pesan[status]) return;

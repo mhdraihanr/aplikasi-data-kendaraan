@@ -56,6 +56,13 @@ body {
   padding: 24px;
 }
 
+.page-title {
+  margin: 0 0 24px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
 .filter-panel {
   background: var(--panel-bg);
   border: 1px solid var(--border);
@@ -175,6 +182,17 @@ body {
   top: 16px;
   right: 16px;
   z-index: 1080;
+}
+
+#kendaraanForm .form-control:disabled,
+#kendaraanForm .form-select:disabled {
+  background: #f5f6f8;
+  color: var(--text);
+  opacity: 1;
+}
+
+#kendaraanForm .form-label {
+  font-weight: 500;
 }
 
 @media (max-width: 991.98px) {
