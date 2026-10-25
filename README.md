@@ -101,7 +101,7 @@ dotnet run
 ## 📂 Struktur Target
 
 ```
-data-kendaraan/
+aplikasi-data-kendaraan/
 ├── README.md
 ├── docs/
 │   ├── 01-PRD.md
