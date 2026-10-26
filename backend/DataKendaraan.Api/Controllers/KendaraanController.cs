@@ -28,14 +28,20 @@ public class KendaraanController : ControllerBase
 
         if (!string.IsNullOrWhiteSpace(noRegistrasi))
         {
-            var term = noRegistrasi.Trim().ToLowerInvariant();
-            query = query.Where(k => k.NoRegistrasi.ToLower().Contains(term));
+            var term = KendaraanNormalizer.CollapseSpaces(noRegistrasi);
+            if (term is not null)
+            {
+                query = query.Where(k => k.NoRegistrasi.ToLower().Contains(term.ToLower()));
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(namaPemilik))
         {
-            var term = namaPemilik.Trim().ToLowerInvariant();
-            query = query.Where(k => k.NamaPemilik.ToLower().Contains(term));
+            var term = KendaraanNormalizer.CollapseSpaces(namaPemilik);
+            if (term is not null)
+            {
+                query = query.Where(k => k.NamaPemilik.ToLower().Contains(term.ToLower()));
+            }
         }
 
         var items = await query
@@ -52,7 +58,7 @@ public class KendaraanController : ControllerBase
         string noRegistrasi,
         CancellationToken cancellationToken)
     {
-        var key = noRegistrasi.Trim();
+        var key = KendaraanNormalizer.NullIfEmpty(noRegistrasi) ?? noRegistrasi;
 
         var entity = await _db.Kendaraan
             .AsNoTracking()
@@ -87,12 +93,12 @@ public class KendaraanController : ControllerBase
         {
             NoRegistrasi = noRegistrasi,
             NamaPemilik = KendaraanNormalizer.CollapseSpaces(request.NamaPemilik)!,
-            Alamat = KendaraanNormalizer.NullIfEmpty(request.Alamat),
-            MerkKendaraan = KendaraanNormalizer.NullIfEmpty(request.MerkKendaraan),
+            Alamat = KendaraanNormalizer.CollapseSpaces(request.Alamat),
+            MerkKendaraan = KendaraanNormalizer.CollapseSpaces(request.MerkKendaraan),
             TahunPembuatan = request.TahunPembuatan,
             KapasitasSilinder = request.KapasitasSilinder,
             Warna = KendaraanNormalizer.NormalizeWarna(request.Warna),
-            BahanBakar = KendaraanNormalizer.NullIfEmpty(request.BahanBakar)
+            BahanBakar = KendaraanNormalizer.CollapseSpaces(request.BahanBakar)
         };
 
         _db.Kendaraan.Add(entity);
@@ -111,7 +117,7 @@ public class KendaraanController : ControllerBase
         [FromBody] KendaraanRequest request,
         CancellationToken cancellationToken)
     {
-        var keyLama = noRegistrasi.Trim();
+        var keyLama = KendaraanNormalizer.NullIfEmpty(noRegistrasi) ?? noRegistrasi;
         var keyBaru = KendaraanNormalizer.NullIfEmpty(request.NoRegistrasi)!;
 
         var adaLama = await _db.Kendaraan
@@ -134,10 +140,10 @@ public class KendaraanController : ControllerBase
         }
 
         var namaPemilik = KendaraanNormalizer.CollapseSpaces(request.NamaPemilik)!;
-        var alamat = KendaraanNormalizer.NullIfEmpty(request.Alamat);
-        var merk = KendaraanNormalizer.NullIfEmpty(request.MerkKendaraan);
+        var alamat = KendaraanNormalizer.CollapseSpaces(request.Alamat);
+        var merk = KendaraanNormalizer.CollapseSpaces(request.MerkKendaraan);
         var warna = KendaraanNormalizer.NormalizeWarna(request.Warna);
-        var bahanBakar = KendaraanNormalizer.NullIfEmpty(request.BahanBakar);
+        var bahanBakar = KendaraanNormalizer.CollapseSpaces(request.BahanBakar);
 
         try
         {
@@ -186,7 +192,7 @@ public class KendaraanController : ControllerBase
         string noRegistrasi,
         CancellationToken cancellationToken)
     {
-        var key = noRegistrasi.Trim();
+        var key = KendaraanNormalizer.NullIfEmpty(noRegistrasi) ?? noRegistrasi;
         var terhapus = await _db.Kendaraan
             .Where(k => k.NoRegistrasi == key)
             .ExecuteDeleteAsync(cancellationToken);

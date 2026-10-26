@@ -10,7 +10,10 @@ const KONFIG_MODE = {
 
 const WARNA_OPTIONS = ["Merah", "Hitam", "Biru", "Abu-Abu"];
 
-const FIELD_WAJIB = new Set(["noRegistrasi", "namaPemilik"]);
+const FIELD_WAJIB = new Map([
+  ["noRegistrasi", "No. Registrasi Kendaraan wajib diisi."],
+  ["namaPemilik", "Nama Pemilik wajib diisi."],
+]);
 
 const FIELD_TEKS = [
   "noRegistrasi",
@@ -40,6 +43,10 @@ const FIELD_DEF = [
 ];
 
 const PESAN_TIDAK_ADA = "Data kendaraan tidak ditemukan.";
+
+// Samakan ruang Unicode jadi spasi biasa agar trim dan kolaps sama dengan server.
+const SPASI_LEBAR =
+  /[\s\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]/g;
 
 function el(tag, props = {}, ...children) {
   const node = document.createElement(tag);
@@ -152,12 +159,25 @@ function tampilkanError(field, pesan) {
   if (control) control.classList.add("is-invalid");
 }
 
+function bersihkanErrorSatu(field) {
+  const node = document.querySelector(`[data-error-for="${field}"]`);
+  if (!node) return;
+
+  node.textContent = "";
+  node.classList.add("d-none");
+  document.getElementById(field)?.classList.remove("is-invalid");
+}
+
+function normalisasiTeks(teks) {
+  return teks.replace(SPASI_LEBAR, " ").trim();
+}
+
 function validasiClient(nilai) {
   const error = {};
 
-  if (!nilai.noRegistrasi)
-    error.noRegistrasi = "No. Registrasi Kendaraan wajib diisi.";
-  if (!nilai.namaPemilik) error.namaPemilik = "Nama Pemilik wajib diisi.";
+  FIELD_WAJIB.forEach((pesan, id) => {
+    if (!nilai[id]) error[id] = pesan;
+  });
 
   const tahunMaks = new Date().getFullYear();
   if (
@@ -177,11 +197,11 @@ function validasiClient(nilai) {
 function bacaForm() {
   const nilai = {};
   FIELD_TEKS.forEach((id) => {
-    nilai[id] = document.getElementById(id).value.trim();
+    nilai[id] = normalisasiTeks(document.getElementById(id).value);
   });
 
   FIELD_ANGKA.forEach((id) => {
-    const raw = document.getElementById(id).value.trim();
+    const raw = normalisasiTeks(document.getElementById(id).value);
     nilai[id] = raw === "" ? "" : Number(raw);
   });
 
@@ -195,6 +215,25 @@ function isiForm(data) {
 
   FIELD_ANGKA.forEach((id) => {
     document.getElementById(id).value = data[id] ?? "";
+  });
+}
+
+function pasangNormalisasiLangsung(form) {
+  FIELD_TEKS.forEach((id) => {
+    const kontrol = form.querySelector(`#${id}`);
+    if (!kontrol) return;
+
+    kontrol.addEventListener("blur", () => {
+      const bersih = normalisasiTeks(kontrol.value);
+      if (bersih === kontrol.value) return;
+
+      kontrol.value = bersih;
+      if (bersih === "" && FIELD_WAJIB.has(id)) {
+        tampilkanError(id, FIELD_WAJIB.get(id));
+        return;
+      }
+      bersihkanErrorSatu(id);
+    });
   });
 }
 
@@ -261,6 +300,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const { form, submit } = bangunForm();
   document.getElementById("formContainer").append(form);
+
+  if (konfig.aksi) pasangNormalisasiLangsung(form);
 
   if (konfig.labelTombol) {
     submit.textContent = konfig.labelTombol;

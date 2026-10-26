@@ -20,16 +20,25 @@ kode (`// BR-06`) dan dari test case.
 
 Diterapkan sebelum validasi & penyimpanan:
 
-| Field                                   | Perlakuan                                                                                                                                         |
-| --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `noRegistrasi`                          | `Trim()`. Simpan apa adanya (jangan auto-uppercase — data boleh berisi format lain).                                                              |
-| `namaPemilik`                           | `Trim()`, kolaps spasi ganda jadi satu.                                                                                                           |
-| `alamat`, `merkKendaraan`, `bahanBakar` | `Trim()`.                                                                                                                                         |
-| `warna`                                 | `Trim()`, lalu pencocokan **case-insensitive** ke 4 opsi; simpan bentuk kanonik (`Merah`, `Hitam`, `Biru`, `Abu-Abu`). Nilai di luar itu → `400`. |
-| Field kosong (`""`)                     | Disimpan sebagai `NULL`, bukan string kosong.                                                                                                     |
+| Field                                     | Perlakuan                                                                                                                                                        |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `noRegistrasi`                            | Trim whitespace Unicode. Simpan apa adanya (jangan auto-uppercase — data boleh berisi format lain).                                                              |
+| `namaPemilik`                             | Trim whitespace Unicode, kolaps whitespace internal jadi satu spasi biasa.                                                                                       |
+| `alamat`, `merkKendaraan`, `bahanBakar`   | Trim whitespace Unicode, kolaps whitespace internal jadi satu spasi biasa.                                                                                       |
+| `warna`                                   | Trim whitespace Unicode, lalu pencocokan **case-insensitive** ke 4 opsi; simpan bentuk kanonik (`Merah`, `Hitam`, `Biru`, `Abu-Abu`). Nilai di luar itu → `400`. |
+| Field kosong (`""` atau hanya whitespace) | Disimpan sebagai `NULL`, bukan string kosong.                                                                                                                    |
 
 **Alasan:** string kosong vs NULL menimbulkan dua representasi "tidak ada nilai"
 yang menyulitkan query dan tampilan.
+
+**Catatan spasi:** `string.Trim()` .NET tidak membuang NBSP (`U+00A0`), U+2009,
+maupun U+3000, sehingga normalizer memakai `char.IsWhiteSpace` /
+`Rune.IsWhiteSpace` (`KendaraanNormalizer`). Kolaps whitespace berlaku juga untuk
+`alamat`, `merkKendaraan`, dan `bahanBakar` agar `"Honda\u00A0Vario"` tidak
+tersimpan dengan NBSP. Filter pencarian (BR-10) memakai jalur normalisasi yang
+sama, jadi teks yang ditempel dari PDF atau web tidak menghasilkan 0 hasil.
+Frontend (`form.js`, pola `SPASI_LEBAR`) mereplikasi aturan ini dan harus
+diselaraskan bila daftar karakter berubah.
 
 ## BR-03 — Field Wajib
 

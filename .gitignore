@@ -19,3 +19,7 @@ Thumbs.db
 
 # Docs
 docs/08-IMPLEMENTATION-GUIDE.md
+docs/DEPLOY-GUIDE.local.md
+
+# Publish output
+publish/

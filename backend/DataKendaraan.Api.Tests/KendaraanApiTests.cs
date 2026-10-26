@@ -131,4 +131,81 @@ public class KendaraanApiTests : IAsyncLifetime
         Assert.Equal("Lionel Messi", body[0].NamaPemilik);
         Assert.Equal("B-7763-TXY", body[0].NoRegistrasi);
     }
+
+    [Theory]
+    [InlineData("\u00A0")]
+    [InlineData("\u2009\u00A0")]
+    [InlineData("\u3000")]
+    [InlineData(" \t ")]
+    public async Task Post_NamaPemilikHanyaWhitespaceUnicode_Mengembalikan400(string nama)
+    {
+        var request = ContohRequest("B-2222-WSP");
+        request.NamaPemilik = nama;
+
+        var response = await _client.PostAsJsonAsync("/api/kendaraan", request);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+
+        var body = await BacaAsync<ApiError>(response);
+        Assert.NotNull(body.Errors);
+        Assert.True(body.Errors!.ContainsKey("namaPemilik"));
+        Assert.Contains("wajib diisi", body.Errors["namaPemilik"][0]);
+    }
+
+    [Fact]
+    public async Task Post_WhitespaceUnicodeDinormalisasi_SebelumDisimpan()
+    {
+        var request = ContohRequest("  B-9001-WSP  ");
+        request.NamaPemilik = "  Budi\u00A0Santoso  ";
+        request.MerkKendaraan = "Honda\u00A0Vario";
+        request.Alamat = "\u00A0Jl.\u3000Baru No 1\u00A0";
+        request.BahanBakar = "\tBensin  ";
+
+        var response = await _client.PostAsJsonAsync("/api/kendaraan", request);
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var body = await BacaAsync<KendaraanDto>(response);
+        Assert.Equal("B-9001-WSP", body.NoRegistrasi);
+        Assert.Equal("Budi Santoso", body.NamaPemilik);
+        Assert.Equal("Honda Vario", body.MerkKendaraan);
+        Assert.Equal("Jl. Baru No 1", body.Alamat);
+        Assert.Equal("Bensin", body.BahanBakar);
+    }
+
+    [Fact]
+    public async Task Get_FilterNamaDenganWhitespaceUnicode_MenemukanData()
+    {
+        var request = ContohRequest("B-9002-WSP");
+        request.NamaPemilik = "Budi\u00A0Santoso";
+        await _client.PostAsJsonAsync("/api/kendaraan", request);
+
+        var url = "/api/kendaraan?namaPemilik=" + Uri.EscapeDataString(" Budi\u3000Santoso ");
+        var response = await _client.GetAsync(url);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await BacaAsync<List<KendaraanDto>>(response);
+        var hasil = Assert.Single(body);
+        Assert.Equal("B-9002-WSP", hasil.NoRegistrasi);
+        Assert.Equal("Budi Santoso", hasil.NamaPemilik);
+    }
+
+    [Fact]
+    public async Task Put_NoRegistrasiDenganWhitespacePinggir_TidakMemicuKonflikPalsu()
+    {
+        var request = ContohRequest("B-1678-BDG");
+        request.NoRegistrasi = "  B-1678-BDG  ";
+        request.NamaPemilik = "Cristiano\u00A0Ronaldo";
+
+        var response = await _client.PutAsJsonAsync(
+            "/api/kendaraan/" + Uri.EscapeDataString(" B-1678-BDG "),
+            request);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var body = await BacaAsync<KendaraanDto>(response);
+        Assert.Equal("B-1678-BDG", body.NoRegistrasi);
+        Assert.Equal("Cristiano Ronaldo", body.NamaPemilik);
+    }
 }
