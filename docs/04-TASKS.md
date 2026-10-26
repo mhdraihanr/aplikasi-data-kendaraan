@@ -152,8 +152,8 @@ jalur kode yang sama dengan Esc sungguhan. Konfigurasi instance:
 
 ## M4 — Testing
 
-- [ ] Smoke test manual untuk 12 skenario di bawah
-- [ ] Unit/integration test minimal untuk controller (xUnit + `WebApplicationFactory`): - [ ] POST valid → 201 - [ ] POST duplikat → 409 - [ ] POST tanpa namaPemilik → 400 - [ ] PUT dengan PK baru yang sudah dipakai → 409 - [ ] DELETE id tidak ada → 404 - [ ] GET dengan filter nama (case-insensitive) → hasil sesuai
+- [x] Smoke test manual untuk 12 skenario di bawah
+- [x] Unit/integration test minimal untuk controller (xUnit + `WebApplicationFactory`): - [x] POST valid → 201 - [x] POST duplikat → 409 - [x] POST tanpa namaPemilik → 400 - [x] PUT dengan PK baru yang sudah dipakai → 409 - [x] DELETE id tidak ada → 404 - [x] GET dengan filter nama (case-insensitive) → hasil sesuai
 
 | #   | Skenario                         | Ekspektasi                                |
 | --- | -------------------------------- | ----------------------------------------- |
@@ -172,15 +172,74 @@ jalur kode yang sama dengan Esc sungguhan. Konfigurasi instance:
 
 **DoD M4:** Semua 12 skenario lulus + minimal 6 test otomatis hijau.
 
+**Bukti DoD M4** (2026-10-25):
+
+Test otomatis — `dotnet test` di `backend/`:
+
+```
+Passed! - Failed: 0, Passed: 6, Skipped: 0, Total: 6
+```
+
+| # | Test | Assert | Hasil |
+| --- | --- | --- | --- |
+| 1 | `POST` valid | `201` + `Location` + body sesuai | ✅ |
+| 2 | `POST` duplikat `B-7763-TXY` | `409`, pesan "Nomor registrasi sudah terdaftar." | ✅ |
+| 3 | `POST` tanpa `namaPemilik` | `400`, `errors.namaPemilik` terisi | ✅ |
+| 4 | `PUT` PK baru sudah dipakai | `409` | ✅ |
+| 5 | `DELETE` id tidak ada | `404`, pesan "Data kendaraan tidak ditemukan." | ✅ |
+| 6 | `GET ?namaPemilik=messi` | `200`, 1 hasil, `Lionel Messi` | ✅ |
+
+12 skenario manual (Playwright + `curl`):
+
+| # | Skenario | Hasil terukur |
+| --- | --- | --- |
+| 1 | Buka Monitoring | 5 baris seed tampil |
+| 2 | Search `b-` | 5 baris, case-insensitive |
+| 3 | Search `messi` | 1 baris → `Lionel Messi` |
+| 4 | Search `zzz` | 0 baris + "Data kendaraan tidak ditemukan." |
+| 5 | Add data lengkap | redirect + toast "berhasil ditambahkan", baris muncul |
+| 6 | Add tanpa Nama Pemilik | tetap di form, pesan "Nama Pemilik wajib diisi.", `is-invalid` |
+| 7 | Add No Reg duplikat | tetap di form, pesan "Nomor registrasi sudah terdaftar." |
+| 8 | Edit tahun tidak valid | UI: "Tahun Pembuatan harus antara 1900 dan 2026."; API `3000` → `400`; API `"abc"` → `400` |
+| 9 | Detail | 8/8 field `disabled`, tanpa tombol submit/Ubah |
+| 10 | Delete → Batal | modal tertutup, baris masih ada |
+| 11 | Delete → OK | baris hilang, `GET` kembali 5 baris |
+| 12 | Restart server | data uji `B-9999-PRS` tetap ada setelah restart (SQLite persisten) |
+
+Catatan skenario 8: input `type="number"` membuat browser menolak huruf `abc`
+sebelum submit (`The specified value "abc" cannot be parsed`), sehingga
+validasi tahun diuji lewat dua jalur tambahan — nilai `1800` di UI dan
+`PUT` langsung dengan `3000` serta `"abc"`. Ketiganya ditolak dengan benar.
+
+Catatan isolasi test: MD5 `kendaraan.db` sebelum dan sesudah `dotnet test`
+identik (`dbc5cff0…`), membuktikan test memakai SQLite in-memory dan tidak
+menyentuh database development.
+
 ---
 
 ## M5 — Delivery (opsional, jika ini dikumpulkan sebagai soal)
 
-- [ ] `README.md`: cara run backend (`dotnet run`), frontend (Live Server / `python -m http.server`), endpoint API
-- [ ] Salin PDF asli ke `docs/source/Application Data Kendaraan.pdf`
+- [x] `README.md`: cara run backend (`dotnet run`), frontend (Live Server / `python -m http.server`), endpoint API
+- [x] Salin PDF asli ke `docs/source/Application Data Kendaraan.pdf`
 - [ ] Screenshot 4 layar (`docs/screenshots/`)
-- [ ] Zona waktu & format tahun konsisten
-- [ ] Cek tidak ada `bin/`, `obj/`, `*.db` di commit akhir
+- [x] Zona waktu & format tahun konsisten
+- [x] Cek tidak ada `bin/`, `obj/`, `*.db` di commit akhir
+
+**Bukti M5** (2026-10-25):
+
+| Butir | Hasil |
+| --- | --- |
+| README | Ditulis ulang: prasyarat, cara run backend/frontend, 3 alternatif server, daftar endpoint + contoh `curl`, bentuk error, struktur folder, tabel 5 data seed |
+| PDF sumber | `docs/source/Application Data Kendaraan.pdf` ada (739.960 byte) |
+| Screenshot | **Belum** — diambil manual oleh user |
+| Konsistensi | `cc` hanya di tabel (`list.js:32`), form tanpa `cc`; tahun tampil apa adanya; 8 pesan validasi semuanya diakhiri titik |
+| Artefak Git | `git ls-files` bersih — tidak ada `bin/`, `obj/`, `*.db`, `node_modules` |
+
+Catatan verifikasi perintah README: `npx http-server . -p 5500 -c-1` diuji dan
+melayani `index.html`, `form.html`, `css/app.css`, `js/list.js` dengan `200`.
+Saat pengujian port 5500 sedang dipakai Live Server (PID `Code.exe`), sehingga
+uji dijalankan di port lain (5511) dengan hasil sama. `dotnet tool restore`
+juga diuji dan berhasil memasang `dotnet-ef 8.0.32`.
 
 ---
 
