@@ -185,10 +185,11 @@ aplikasi-data-kendaraan/
 │   ├── DataKendaraan.Api/            # Web API .NET 8
 │   │   ├── Controllers/              # KendaraanController, 5 endpoint
 │   │   ├── Data/                     # AppDbContext, DbInitializer
-│   │   ├── Dtos/                     # KendaraanRequest, KendaraanDto, ApiError
+│   │   ├── Dtos/                     # KendaraanRequest, KendaraanDto, ApiError,
+│   │   │                             #   TahunPembuatan, WarnaKendaraan
 │   │   ├── Models/                   # entity Kendaraan
-│   │   ├── Services/                 # KendaraanNormalizer
-│   │   ├── Validation/               # TahunPembuatan, WarnaKendaraan
+│   │   ├── Services/                 # KendaraanService, KendaraanNormalizer,
+│   │   │                             #   ApiExceptionHandler
 │   │   ├── Migrations/
 │   │   └── kendaraan.db              # SQLite, tidak di-commit
 │   └── DataKendaraan.Api.Tests/      # xUnit dan WebApplicationFactory
@@ -196,9 +197,15 @@ aplikasi-data-kendaraan/
 │   ├── index.html                    # Monitoring
 │   ├── form.html                     # Tambah, Edit, Detail lewat ?mode=
 │   ├── css/app.css
-│   └── js/                           # api, list, form, toast, pesan
+│   └── js/
+│       ├── core/                     # api, pesan — tidak menyentuh DOM
+│       ├── ui/                       # toast — komponen tampilan
+│       └── pages/                    # list, form — satu file per halaman
 └── docs/                             # PRD, DESIGN, DATA-MODEL, TASKS, dll
 ```
+
+Arah dependensi frontend satu arah: `pages/` → `ui/` → `core/`. Folder `core/`
+tidak boleh memanggil kode dari `ui/` atau `pages/`.
 
 ---
 

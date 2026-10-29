@@ -15,7 +15,6 @@ public static class KendaraanNormalizer
             string.Equals(valid, trimmed, StringComparison.OrdinalIgnoreCase));
     }
 
-    // IsWhiteSpace menutup NBSP, U+2009, dan U+3000 yang lolos string.Trim().
     public static string? NullIfEmpty(string? value)
     {
         if (string.IsNullOrWhiteSpace(value)) return null;

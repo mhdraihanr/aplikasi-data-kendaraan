@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using DataKendaraan.Api.Services;
 
-namespace DataKendaraan.Api.Validation;
+namespace DataKendaraan.Api.Dtos;
 
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class WarnaKendaraanAttribute : ValidationAttribute

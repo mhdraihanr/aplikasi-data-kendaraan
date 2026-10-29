@@ -78,7 +78,8 @@ Hanya dua field yang wajib: **No Registrasi Kendaraan** dan **Nama Pemilik**.
 - Boleh kosong (`NULL`) → form menampilkan placeholder "Pilih Warna".
 - Validasi tiga lapis:
   1. Frontend: `<select>` hanya berisi 4 opsi.
-  2. Server: `RegularExpression` di DTO.
+  2. Server: `WarnaKendaraanAttribute` memanggil
+     `KendaraanNormalizer.NormalizeWarna` (case-insensitive match).
   3. DB: `CHECK (warna IS NULL OR warna IN (...))`.
 - Nilai selain 4 di atas (termasuk `merah` huruf kecil dari API langsung)
   dinormalisasi ke bentuk kanonik oleh BR-02; bila tidak bisa dipetakan → `400`.

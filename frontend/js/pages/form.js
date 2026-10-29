@@ -44,7 +44,6 @@ const FIELD_DEF = [
 
 const PESAN_TIDAK_ADA = "Data kendaraan tidak ditemukan.";
 
-// Samakan ruang Unicode jadi spasi biasa agar trim dan kolaps sama dengan server.
 const SPASI_LEBAR =
   /[\s\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000\uFEFF]/g;
 
@@ -141,31 +140,26 @@ function bangunForm() {
 }
 
 function bersihkanError() {
-  document.querySelectorAll("[data-error-for]").forEach((node) => {
-    node.textContent = "";
-    node.classList.add("d-none");
-    const control = document.getElementById(node.dataset.errorFor);
-    if (control) control.classList.remove("is-invalid");
+  $("[data-error-for]").each(function () {
+    $(this).text("").addClass("d-none");
+    $("#" + this.dataset.errorFor).removeClass("is-invalid");
   });
 }
 
 function tampilkanError(field, pesan) {
-  const node = document.querySelector(`[data-error-for="${field}"]`);
-  const control = document.getElementById(field);
-  if (!node) return;
+  const $node = $(`[data-error-for="${field}"]`);
+  if (!$node.length) return;
 
-  node.textContent = pesan;
-  node.classList.remove("d-none");
-  if (control) control.classList.add("is-invalid");
+  $node.text(pesan).removeClass("d-none");
+  $("#" + field).addClass("is-invalid");
 }
 
 function bersihkanErrorSatu(field) {
-  const node = document.querySelector(`[data-error-for="${field}"]`);
-  if (!node) return;
+  const $node = $(`[data-error-for="${field}"]`);
+  if (!$node.length) return;
 
-  node.textContent = "";
-  node.classList.add("d-none");
-  document.getElementById(field)?.classList.remove("is-invalid");
+  $node.text("").addClass("d-none");
+  $("#" + field).removeClass("is-invalid");
 }
 
 function normalisasiTeks(teks) {
@@ -197,11 +191,11 @@ function validasiClient(nilai) {
 function bacaForm() {
   const nilai = {};
   FIELD_TEKS.forEach((id) => {
-    nilai[id] = normalisasiTeks(document.getElementById(id).value);
+    nilai[id] = normalisasiTeks($("#" + id).val() ?? "");
   });
 
   FIELD_ANGKA.forEach((id) => {
-    const raw = normalisasiTeks(document.getElementById(id).value);
+    const raw = normalisasiTeks($("#" + id).val() ?? "");
     nilai[id] = raw === "" ? "" : Number(raw);
   });
 
@@ -209,12 +203,8 @@ function bacaForm() {
 }
 
 function isiForm(data) {
-  FIELD_TEKS.forEach((id) => {
-    document.getElementById(id).value = data[id] ?? "";
-  });
-
-  FIELD_ANGKA.forEach((id) => {
-    document.getElementById(id).value = data[id] ?? "";
+  [...FIELD_TEKS, ...FIELD_ANGKA].forEach((id) => {
+    $("#" + id).val(data[id] ?? "");
   });
 }
 
@@ -238,14 +228,9 @@ function pasangNormalisasiLangsung(form) {
 }
 
 function kunciForm() {
-  document
-    .querySelectorAll(
-      "#kendaraanForm input, #kendaraanForm select, #kendaraanForm textarea",
-    )
-    .forEach((control) => {
-      control.disabled = true;
-      control.style.cursor = "not-allowed";
-    });
+  $("#kendaraanForm input, #kendaraanForm select, #kendaraanForm textarea")
+    .prop("disabled", true)
+    .css("cursor", "not-allowed");
 }
 
 async function simpan(nilai, idLama, aksi) {
@@ -269,7 +254,7 @@ function tanganiError(error) {
     const tanpaField = [];
 
     Object.entries(error.errors).forEach(([field, pesan]) => {
-      if (document.querySelector(`[data-error-for="${field}"]`)) {
+      if ($(`[data-error-for="${field}"]`).length) {
         tampilkanError(field, pesan[0]);
       } else {
         tanpaField.push(pesan[0]);
@@ -290,16 +275,16 @@ function tanganiError(error) {
   showToast(error.message ?? PESAN.koneksiGagal, "error");
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
+$(async function () {
   const params = new URLSearchParams(window.location.search);
   const mode = params.get("mode") ?? "tambah";
   const konfig = KONFIG_MODE[mode] ?? KONFIG_MODE.tambah;
   const idLama = params.get("id");
 
-  document.getElementById("formTitle").textContent = konfig.judul;
+  $("#formTitle").text(konfig.judul);
 
   const { form, submit } = bangunForm();
-  document.getElementById("formContainer").append(form);
+  $("#formContainer").append(form);
 
   if (konfig.aksi) pasangNormalisasiLangsung(form);
 
@@ -326,7 +311,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
 
-    form.addEventListener("submit", async (event) => {
+    $(form).on("submit", async (event) => {
       event.preventDefault();
       bersihkanError();
 

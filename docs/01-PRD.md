@@ -4,7 +4,7 @@
 **Sumber:** `Application Data Kendaraan.pdf` (soal test)
 **Backend:** C# ASP.NET Core Web API + EF Core
 **Frontend:** HTML + CSS + JavaScript (jQuery, Bootstrap 5)
-**Database:** SQLite (file) untuk development, **PostgreSQL untuk production**
+**Database:** SQLite (file) untuk development; PostgreSQL belum diimplementasi, lihat `DEPLOY-GUIDE.local.md`
 
 ---
 
@@ -114,7 +114,7 @@ Tidak paham teknis; butuh form yang jelas dan pesan error berbahasa Indonesia.
 **AC:**
 
 - [ ] Tautan **Edit** di tabel membuka form Edit Data Kendaraan, terisi data yang ada.
-- [ ] Semua field dapat diubah, termasuk **No Registrasi** (karena ini PK, lihat Business Rules §6.3).
+- [ ] Semua field dapat diubah, termasuk **No Registrasi** (karena ini PK, lihat BR-08).
 - [ ] Tombol aksi: **Ubah** (biru, primary) lalu **Kembali** (abu-abu, secondary).
 - [ ] Setelah Ubah berhasil → redirect ke Monitoring + notifikasi
       "Data kendaraan berhasil diubah."
@@ -175,7 +175,7 @@ Tidak paham teknis; butuh form yang jelas dan pesan error berbahasa Indonesia.
 | Bahasa UI         | Bahasa Indonesia, termasuk pesan validasi                       |
 | Waktu muat daftar | < 1 detik untuk 500 baris                                       |
 | Aksesibilitas     | Setiap input punya `<label for>`; modal bisa ditutup dengan Esc |
-| Konvensi kode     | Lihat `docs/../.editorconfig` & standar di PRD ini              |
+| Konvensi kode     | Standar di PRD ini dan aturan bisnis di `05-BUSINESS-RULES.md`  |
 
 ## 7. Definisi Selesai (DoD)
 

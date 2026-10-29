@@ -7,13 +7,13 @@ Format: JSON (`application/json`), field camelCase.
 
 ## Ringkasan Endpoint
 
-| Method | Path | Fungsi | Sukses |
-|---|---|---|---|
-| GET | `/kendaraan` | List + filter | `200` |
-| GET | `/kendaraan/{noRegistrasi}` | Detail satu data | `200` |
-| POST | `/kendaraan` | Tambah | `201` |
-| PUT | `/kendaraan/{noRegistrasi}` | Ubah (PK boleh berubah) | `200` |
-| DELETE | `/kendaraan/{noRegistrasi}` | Hapus | `204` |
+| Method | Path                        | Fungsi                  | Sukses |
+| ------ | --------------------------- | ----------------------- | ------ |
+| GET    | `/kendaraan`                | List + filter           | `200`  |
+| GET    | `/kendaraan/{noRegistrasi}` | Detail satu data        | `200`  |
+| POST   | `/kendaraan`                | Tambah                  | `201`  |
+| PUT    | `/kendaraan/{noRegistrasi}` | Ubah (PK boleh berubah) | `200`  |
+| DELETE | `/kendaraan/{noRegistrasi}` | Hapus                   | `204`  |
 
 ---
 
@@ -21,12 +21,13 @@ Format: JSON (`application/json`), field camelCase.
 
 Query params (opsional, keduanya AND, contains + case-insensitive):
 
-| Param | Tipe | Contoh |
-|---|---|---|
+| Param          | Tipe   | Contoh   |
+| -------------- | ------ | -------- |
 | `noRegistrasi` | string | `b-7763` |
-| `namaPemilik` | string | `messi` |
+| `namaPemilik`  | string | `messi`  |
 
 Response `200`:
+
 ```json
 [
   {
@@ -41,6 +42,7 @@ Response `200`:
   }
 ]
 ```
+
 Urut `noRegistrasi` ASC. Tanpa hasil → `[]`.
 
 ---
@@ -55,6 +57,7 @@ Urut `noRegistrasi` ASC. Tanpa hasil → `[]`.
 ## 3. `POST /api/kendaraan`
 
 Request:
+
 ```json
 {
   "noRegistrasi": "B-1234-ABC",
@@ -104,18 +107,26 @@ Request:
   }
 }
 ```
-`errors` hanya ada untuk `400`. Untuk `404`/`409`/`500`, cukup `message`.
+
+`errors` hanya ada untuk `400`. Untuk `404`/`409` cukup `message`. Untuk `500`,
+`ApiExceptionHandler` mengembalikan bentuk yang sama tanpa detail internal:
+
+```json
+{ "message": "Terjadi kesalahan pada server." }
+```
+
+Exception asli dicatat di log server beserta method, path, dan stack trace.
 Frontend membaca `errors` untuk menempelkan pesan ke field yang sesuai
 lewat atribut `[data-error-for="{namaField}"]`.
 
 ## 7. Status code ringkas
 
-| Kode | Kapan |
-|---|---|
-| 200 | GET/PUT sukses |
-| 201 | POST sukses |
-| 204 | DELETE sukses |
-| 400 | Validasi gagal / body tidak terbaca |
-| 404 | `noRegistrasi` tidak ada |
-| 409 | PK duplikat |
-| 500 | Error tak terduga |
+| Kode | Kapan                                                                     |
+| ---- | ------------------------------------------------------------------------- |
+| 200  | GET/PUT sukses                                                            |
+| 201  | POST sukses                                                               |
+| 204  | DELETE sukses                                                             |
+| 400  | Validasi gagal / body tidak terbaca                                       |
+| 404  | `noRegistrasi` tidak ada                                                  |
+| 409  | PK duplikat                                                               |
+| 500  | Error tak terduga, body `{ "message": "Terjadi kesalahan pada server." }` |

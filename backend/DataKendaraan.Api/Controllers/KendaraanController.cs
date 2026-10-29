@@ -1,22 +1,13 @@
-using System.Data.Common;
-using DataKendaraan.Api.Data;
 using DataKendaraan.Api.Dtos;
-using DataKendaraan.Api.Models;
 using DataKendaraan.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 
 namespace DataKendaraan.Api.Controllers;
 
 [ApiController]
 [Route("api/kendaraan")]
-public class KendaraanController : ControllerBase
+public class KendaraanController(KendaraanService service) : ControllerBase
 {
-    private readonly AppDbContext _db;
-
-    public KendaraanController(AppDbContext db) => _db = db;
-
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<KendaraanDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<IEnumerable<KendaraanDto>>> GetAll(
@@ -24,31 +15,8 @@ public class KendaraanController : ControllerBase
         [FromQuery] string? namaPemilik,
         CancellationToken cancellationToken)
     {
-        var query = _db.Kendaraan.AsNoTracking();
-
-        if (!string.IsNullOrWhiteSpace(noRegistrasi))
-        {
-            var term = KendaraanNormalizer.CollapseSpaces(noRegistrasi);
-            if (term is not null)
-            {
-                query = query.Where(k => k.NoRegistrasi.ToLower().Contains(term.ToLower()));
-            }
-        }
-
-        if (!string.IsNullOrWhiteSpace(namaPemilik))
-        {
-            var term = KendaraanNormalizer.CollapseSpaces(namaPemilik);
-            if (term is not null)
-            {
-                query = query.Where(k => k.NamaPemilik.ToLower().Contains(term.ToLower()));
-            }
-        }
-
-        var items = await query
-            .OrderBy(k => k.NoRegistrasi)
-            .ToListAsync(cancellationToken);
-
-        return Ok(items.Select(ToDto).ToList());
+        var items = await service.CariAsync(noRegistrasi, namaPemilik, cancellationToken);
+        return Ok(items);
     }
 
     [HttpGet("{noRegistrasi}")]
@@ -58,18 +26,11 @@ public class KendaraanController : ControllerBase
         string noRegistrasi,
         CancellationToken cancellationToken)
     {
-        var key = KendaraanNormalizer.NullIfEmpty(noRegistrasi) ?? noRegistrasi;
+        var data = await service.AmbilAsync(noRegistrasi, cancellationToken);
 
-        var entity = await _db.Kendaraan
-            .AsNoTracking()
-            .FirstOrDefaultAsync(k => k.NoRegistrasi == key, cancellationToken);
-
-        if (entity is null)
-        {
-            return NotFound(new ApiError("Data kendaraan tidak ditemukan."));
-        }
-
-        return Ok(ToDto(entity));
+        return data is null
+            ? NotFound(new ApiError("Data kendaraan tidak ditemukan."))
+            : Ok(data);
     }
 
     [HttpPost]
@@ -80,31 +41,17 @@ public class KendaraanController : ControllerBase
         [FromBody] KendaraanRequest request,
         CancellationToken cancellationToken)
     {
-        var noRegistrasi = KendaraanNormalizer.NullIfEmpty(request.NoRegistrasi)!;
-        var exists = await _db.Kendaraan
-            .AnyAsync(k => k.NoRegistrasi == noRegistrasi, cancellationToken);
+        var (hasil, data) = await service.TambahAsync(request, cancellationToken);
 
-        if (exists)
+        if (hasil == HasilSimpan.Bentrok)
         {
             return Conflict(new ApiError("Nomor registrasi sudah terdaftar."));
         }
 
-        var entity = new Kendaraan
-        {
-            NoRegistrasi = noRegistrasi,
-            NamaPemilik = KendaraanNormalizer.CollapseSpaces(request.NamaPemilik)!,
-            Alamat = KendaraanNormalizer.CollapseSpaces(request.Alamat),
-            MerkKendaraan = KendaraanNormalizer.CollapseSpaces(request.MerkKendaraan),
-            TahunPembuatan = request.TahunPembuatan,
-            KapasitasSilinder = request.KapasitasSilinder,
-            Warna = KendaraanNormalizer.NormalizeWarna(request.Warna),
-            BahanBakar = KendaraanNormalizer.CollapseSpaces(request.BahanBakar)
-        };
-
-        _db.Kendaraan.Add(entity);
-        await _db.SaveChangesAsync(cancellationToken);
-
-        return CreatedAtAction(nameof(GetById), new { noRegistrasi = entity.NoRegistrasi }, ToDto(entity));
+        return CreatedAtAction(
+            nameof(GetById),
+            new { noRegistrasi = data!.NoRegistrasi },
+            data);
     }
 
     [HttpPut("{noRegistrasi}")]
@@ -117,72 +64,14 @@ public class KendaraanController : ControllerBase
         [FromBody] KendaraanRequest request,
         CancellationToken cancellationToken)
     {
-        var keyLama = KendaraanNormalizer.NullIfEmpty(noRegistrasi) ?? noRegistrasi;
-        var keyBaru = KendaraanNormalizer.NullIfEmpty(request.NoRegistrasi)!;
+        var (hasil, data) = await service.UbahAsync(noRegistrasi, request, cancellationToken);
 
-        var adaLama = await _db.Kendaraan
-            .AnyAsync(k => k.NoRegistrasi == keyLama, cancellationToken);
-
-        if (!adaLama)
+        return hasil switch
         {
-            return NotFound(new ApiError("Data kendaraan tidak ditemukan."));
-        }
-
-        if (keyBaru != keyLama)
-        {
-            var bentrok = await _db.Kendaraan
-                .AnyAsync(k => k.NoRegistrasi == keyBaru, cancellationToken);
-
-            if (bentrok)
-            {
-                return Conflict(new ApiError("Nomor registrasi sudah terdaftar."));
-            }
-        }
-
-        var namaPemilik = KendaraanNormalizer.CollapseSpaces(request.NamaPemilik)!;
-        var alamat = KendaraanNormalizer.CollapseSpaces(request.Alamat);
-        var merk = KendaraanNormalizer.CollapseSpaces(request.MerkKendaraan);
-        var warna = KendaraanNormalizer.NormalizeWarna(request.Warna);
-        var bahanBakar = KendaraanNormalizer.CollapseSpaces(request.BahanBakar);
-
-        try
-        {
-            var terpengaruh = await _db.Kendaraan
-                .Where(k => k.NoRegistrasi == keyLama)
-                .ExecuteUpdateAsync(setters => setters
-                    .SetProperty(k => k.NoRegistrasi, keyBaru)
-                    .SetProperty(k => k.NamaPemilik, namaPemilik)
-                    .SetProperty(k => k.Alamat, alamat)
-                    .SetProperty(k => k.MerkKendaraan, merk)
-                    .SetProperty(k => k.TahunPembuatan, request.TahunPembuatan)
-                    .SetProperty(k => k.KapasitasSilinder, request.KapasitasSilinder)
-                    .SetProperty(k => k.Warna, warna)
-                    .SetProperty(k => k.BahanBakar, bahanBakar),
-                    cancellationToken);
-
-            if (terpengaruh == 0)
-            {
-                return NotFound(new ApiError("Data kendaraan tidak ditemukan."));
-            }
-        }
-        catch (DbException ex) when (ex is SqliteException { SqliteErrorCode: 19 })
-        {
-            return Conflict(new ApiError("Nomor registrasi sudah terdaftar."));
-        }
-
-        var entity = new Kendaraan
-        {
-            NoRegistrasi = keyBaru,
-            NamaPemilik = namaPemilik,
-            Alamat = alamat,
-            MerkKendaraan = merk,
-            TahunPembuatan = request.TahunPembuatan,
-            KapasitasSilinder = request.KapasitasSilinder,
-            Warna = warna,
-            BahanBakar = bahanBakar
+            HasilSimpan.TidakDitemukan => NotFound(new ApiError("Data kendaraan tidak ditemukan.")),
+            HasilSimpan.Bentrok => Conflict(new ApiError("Nomor registrasi sudah terdaftar.")),
+            _ => Ok(data)
         };
-
-        return Ok(ToDto(entity));
     }
 
     [HttpDelete("{noRegistrasi}")]
@@ -192,26 +81,10 @@ public class KendaraanController : ControllerBase
         string noRegistrasi,
         CancellationToken cancellationToken)
     {
-        var key = KendaraanNormalizer.NullIfEmpty(noRegistrasi) ?? noRegistrasi;
-        var terhapus = await _db.Kendaraan
-            .Where(k => k.NoRegistrasi == key)
-            .ExecuteDeleteAsync(cancellationToken);
+        var terhapus = await service.HapusAsync(noRegistrasi, cancellationToken);
 
-        if (terhapus == 0)
-        {
-            return NotFound(new ApiError("Data kendaraan tidak ditemukan."));
-        }
-
-        return NoContent();
+        return terhapus
+            ? NoContent()
+            : NotFound(new ApiError("Data kendaraan tidak ditemukan."));
     }
-
-    private static KendaraanDto ToDto(Kendaraan k) => new(
-        k.NoRegistrasi,
-        k.NamaPemilik,
-        k.Alamat,
-        k.MerkKendaraan,
-        k.TahunPembuatan,
-        k.KapasitasSilinder,
-        k.Warna,
-        k.BahanBakar);
 }

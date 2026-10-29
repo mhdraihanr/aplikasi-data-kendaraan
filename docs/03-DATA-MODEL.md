@@ -1,7 +1,8 @@
 # DATA MODEL — Aplikasi Data Kendaraan
 
-Stack: **C# ASP.NET Core Web API (.NET 8) + EF Core 8**, database SQLite untuk
-development dan PostgreSQL untuk production.
+Stack: **C# ASP.NET Core Web API (.NET 8) + EF Core 8**, database SQLite. Provider
+PostgreSQL sudah disiapkan sebagai rencana deploy (lihat `DEPLOY-GUIDE.local.md`)
+tetapi belum diimplementasi.
 
 ---
 

@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using DataKendaraan.Api.Validation;
 
 namespace DataKendaraan.Api.Dtos;
 

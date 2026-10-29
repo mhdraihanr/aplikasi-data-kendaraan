@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace DataKendaraan.Api.Validation;
+namespace DataKendaraan.Api.Dtos;
 
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class TahunPembuatanAttribute : ValidationAttribute

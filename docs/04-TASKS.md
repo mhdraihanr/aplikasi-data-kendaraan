@@ -41,7 +41,8 @@ Legend: `[ ]` belum · `[x]` selesai · `[~]` sedang dikerjakan
 - [x] `Data/DbInitializer.cs` — seed 5 data dari §7, hanya jika tabel kosong
 - [x] `Dtos/KendaraanDto.cs` + `Dtos/KendaraanRequest.cs`
 - [x] Migration: `dotnet ef migrations add InitialCreate`
-- [x] `Program.cs`: register `AppDbContext` (SQLite di dev, PostgreSQL di prod), panggil `Migrate()` + `SeedAsync()` saat startup
+- [x] `Program.cs`: register `AppDbContext` (SQLite), panggil `Migrate()` + `SeedAsync()` saat startup
+- [ ] Pindah ke PostgreSQL untuk production (lihat `DEPLOY-GUIDE.local.md`)
 - [x] Cek: `kendaraan.db` terbentuk, 5 baris ter-seed
 
 **DoD M1:** tabel `kendaraan` ada di DB dengan 5 baris seed dan constraint lengkap.
@@ -77,11 +78,11 @@ Semua endpoint di bawah harus muncul di Swagger dan berfungsi lewat curl/Postman
 ### M3.1 Kerangka
 
 - [x] `frontend/css/app.css` — CSS variable warna (§1 DESIGN), style header, filter panel, tabel, empty-state
-- [x] `frontend/js/api.js` — `getList(filters)`, `getOne(id)`, `create(payload)`, `update(id, payload)`, `remove(id)`; base URL configurable (`const API_BASE = 'http://localhost:5000/api'`)
-- [x] `frontend/js/toast.js` — `showToast(message, type)`
+- [x] `frontend/js/core/api.js` — `getList(filters)`, `getOne(id)`, `create(payload)`, `update(id, payload)`, `remove(id)`; base URL configurable (`const API_BASE = 'http://localhost:5000/api'`)
+- [x] `frontend/js/ui/toast.js` — `showToast(message, type)`
 - [x] Skeleton `index.html` dengan header + container
 
-### M3.2 Halaman Monitoring (`index.html` + `js/list.js`)
+### M3.2 Halaman Monitoring (`index.html` + `js/pages/list.js`)
 
 - [x] Panel filter: 2 input + tombol Search & Add (§2 DESIGN)
 - [x] Render tabel 9 kolom dari `GET /api/kendaraan`
@@ -117,16 +118,16 @@ Semua endpoint di bawah harus muncul di Swagger dan berfungsi lewat curl/Postman
 
 **Bukti verifikasi M3.4** (Playwright, Chromium):
 
-| Kriteria | Hasil |
-| --- | --- |
-| 1366px | tabel tidak scroll, `docOverflowX: false`, panel 1152px |
-| 900px | `tableScrollable: true`, `overflow-x: auto`, `docOverflowX: false` |
-| 400px | `tableScrollable: true`, `.filter-actions` `flex-direction: column`, `docOverflowX: false` |
-| `aria-label` aksi | `Detail data B-1678-BDG`, `Edit data B-1678-BDG`, `Hapus data B-1678-BDG` |
-| `aria-label` modal | `role="dialog"`, `aria-modal="true"`, `aria-labelledby="deleteModalText"` |
-| Label input | `index.html` 2/2, `form.html` 8/8 di ketiga mode — `inputTanpaLabel: []` |
-| Esc | `keydown` diterima modal → `Modal.hide()` terpanggil → `show` class lepas, `display: none` |
-| Console | 0 error di `index.html`, `form.html?mode=tambah`, `?mode=edit`, `?mode=detail` |
+| Kriteria           | Hasil                                                                                      |
+| ------------------ | ------------------------------------------------------------------------------------------ |
+| 1366px             | tabel tidak scroll, `docOverflowX: false`, panel 1152px                                    |
+| 900px              | `tableScrollable: true`, `overflow-x: auto`, `docOverflowX: false`                         |
+| 400px              | `tableScrollable: true`, `.filter-actions` `flex-direction: column`, `docOverflowX: false` |
+| `aria-label` aksi  | `Detail data B-1678-BDG`, `Edit data B-1678-BDG`, `Hapus data B-1678-BDG`                  |
+| `aria-label` modal | `role="dialog"`, `aria-modal="true"`, `aria-labelledby="deleteModalText"`                  |
+| Label input        | `index.html` 2/2, `form.html` 8/8 di ketiga mode — `inputTanpaLabel: []`                   |
+| Esc                | `keydown` diterima modal → `Modal.hide()` terpanggil → `show` class lepas, `display: none` |
+| Console            | 0 error di `index.html`, `form.html?mode=tambah`, `?mode=edit`, `?mode=detail`             |
 
 Catatan pengujian Esc: `page.keyboard.press('Escape')` Playwright tidak
 menyampaikan event karena jendela browser headless kehilangan fokus OS
@@ -139,21 +140,21 @@ jalur kode yang sama dengan Esc sungguhan. Konfigurasi instance:
 
 **Bukti DoD M3** (E2E Playwright, tanpa Swagger):
 
-| # | User story | Hasil |
-| --- | --- | --- |
-| 1 | Lihat daftar | 5 baris seed tampil |
-| 2 | Filter | `GET /api/kendaraan?noRegistrasi=...` terpanggil |
-| 3 | Tambah | toast "Data kendaraan berhasil ditambahkan.", baris ke-6 muncul |
-| 4 | Detail | 8 field `disabled`, hanya tombol Kembali |
-| 5 | Edit | prefill benar, toast "Data kendaraan berhasil diperbarui.", baris ter-update |
-| 6 | Hapus | modal konfirmasi → OK → toast, baris hilang, data kembali 5 seed |
+| #   | User story   | Hasil                                                                        |
+| --- | ------------ | ---------------------------------------------------------------------------- |
+| 1   | Lihat daftar | 5 baris seed tampil                                                          |
+| 2   | Filter       | `GET /api/kendaraan?noRegistrasi=...` terpanggil                             |
+| 3   | Tambah       | toast "Data kendaraan berhasil ditambahkan.", baris ke-6 muncul              |
+| 4   | Detail       | 8 field `disabled`, hanya tombol Kembali                                     |
+| 5   | Edit         | prefill benar, toast "Data kendaraan berhasil diperbarui.", baris ter-update |
+| 6   | Hapus        | modal konfirmasi → OK → toast, baris hilang, data kembali 5 seed             |
 
 ---
 
 ## M4 — Testing
 
 - [x] Smoke test manual untuk 12 skenario di bawah
-- [x] Unit/integration test minimal untuk controller (xUnit + `WebApplicationFactory`): - [x] POST valid → 201 - [x] POST duplikat → 409 - [x] POST tanpa namaPemilik → 400 - [x] PUT dengan PK baru yang sudah dipakai → 409 - [x] DELETE id tidak ada → 404 - [x] GET dengan filter nama (case-insensitive) → hasil sesuai
+- [x] Unit/integration test minimal untuk controller (xUnit + `WebApplicationFactory`): - [x] POST valid → 201 - [x] POST duplikat → 409 - [x] POST tanpa namaPemilik → 400 - [x] PUT dengan PK baru yang sudah dipakai → 409 - [x] DELETE id tidak ada → 404 - [x] GET dengan filter nama (case-insensitive) → hasil sesuai - [x] `ApiExceptionHandler` → 500 JSON tanpa detail internal
 
 | #   | Skenario                         | Ekspektasi                                |
 | --- | -------------------------------- | ----------------------------------------- |
@@ -177,34 +178,34 @@ jalur kode yang sama dengan Esc sungguhan. Konfigurasi instance:
 Test otomatis — `dotnet test` di `backend/`:
 
 ```
-Passed! - Failed: 0, Passed: 6, Skipped: 0, Total: 6
+Passed! - Failed: 0, Passed: 13, Skipped: 0, Total: 13
 ```
 
-| # | Test | Assert | Hasil |
-| --- | --- | --- | --- |
-| 1 | `POST` valid | `201` + `Location` + body sesuai | ✅ |
-| 2 | `POST` duplikat `B-7763-TXY` | `409`, pesan "Nomor registrasi sudah terdaftar." | ✅ |
-| 3 | `POST` tanpa `namaPemilik` | `400`, `errors.namaPemilik` terisi | ✅ |
-| 4 | `PUT` PK baru sudah dipakai | `409` | ✅ |
-| 5 | `DELETE` id tidak ada | `404`, pesan "Data kendaraan tidak ditemukan." | ✅ |
-| 6 | `GET ?namaPemilik=messi` | `200`, 1 hasil, `Lionel Messi` | ✅ |
+| #   | Test                         | Assert                                           | Hasil |
+| --- | ---------------------------- | ------------------------------------------------ | ----- |
+| 1   | `POST` valid                 | `201` + `Location` + body sesuai                 | ✅    |
+| 2   | `POST` duplikat `B-7763-TXY` | `409`, pesan "Nomor registrasi sudah terdaftar." | ✅    |
+| 3   | `POST` tanpa `namaPemilik`   | `400`, `errors.namaPemilik` terisi               | ✅    |
+| 4   | `PUT` PK baru sudah dipakai  | `409`                                            | ✅    |
+| 5   | `DELETE` id tidak ada        | `404`, pesan "Data kendaraan tidak ditemukan."   | ✅    |
+| 6   | `GET ?namaPemilik=messi`     | `200`, 1 hasil, `Lionel Messi`                   | ✅    |
 
 12 skenario manual (Playwright + `curl`):
 
-| # | Skenario | Hasil terukur |
-| --- | --- | --- |
-| 1 | Buka Monitoring | 5 baris seed tampil |
-| 2 | Search `b-` | 5 baris, case-insensitive |
-| 3 | Search `messi` | 1 baris → `Lionel Messi` |
-| 4 | Search `zzz` | 0 baris + "Data kendaraan tidak ditemukan." |
-| 5 | Add data lengkap | redirect + toast "berhasil ditambahkan", baris muncul |
-| 6 | Add tanpa Nama Pemilik | tetap di form, pesan "Nama Pemilik wajib diisi.", `is-invalid` |
-| 7 | Add No Reg duplikat | tetap di form, pesan "Nomor registrasi sudah terdaftar." |
-| 8 | Edit tahun tidak valid | UI: "Tahun Pembuatan harus antara 1900 dan 2026."; API `3000` → `400`; API `"abc"` → `400` |
-| 9 | Detail | 8/8 field `disabled`, tanpa tombol submit/Ubah |
-| 10 | Delete → Batal | modal tertutup, baris masih ada |
-| 11 | Delete → OK | baris hilang, `GET` kembali 5 baris |
-| 12 | Restart server | data uji `B-9999-PRS` tetap ada setelah restart (SQLite persisten) |
+| #   | Skenario               | Hasil terukur                                                                              |
+| --- | ---------------------- | ------------------------------------------------------------------------------------------ |
+| 1   | Buka Monitoring        | 5 baris seed tampil                                                                        |
+| 2   | Search `b-`            | 5 baris, case-insensitive                                                                  |
+| 3   | Search `messi`         | 1 baris → `Lionel Messi`                                                                   |
+| 4   | Search `zzz`           | 0 baris + "Data kendaraan tidak ditemukan."                                                |
+| 5   | Add data lengkap       | redirect + toast "berhasil ditambahkan", baris muncul                                      |
+| 6   | Add tanpa Nama Pemilik | tetap di form, pesan "Nama Pemilik wajib diisi.", `is-invalid`                             |
+| 7   | Add No Reg duplikat    | tetap di form, pesan "Nomor registrasi sudah terdaftar."                                   |
+| 8   | Edit tahun tidak valid | UI: "Tahun Pembuatan harus antara 1900 dan 2026."; API `3000` → `400`; API `"abc"` → `400` |
+| 9   | Detail                 | 8/8 field `disabled`, tanpa tombol submit/Ubah                                             |
+| 10  | Delete → Batal         | modal tertutup, baris masih ada                                                            |
+| 11  | Delete → OK            | baris hilang, `GET` kembali 5 baris                                                        |
+| 12  | Restart server         | data uji `B-9999-PRS` tetap ada setelah restart (SQLite persisten)                         |
 
 Catatan skenario 8: input `type="number"` membuat browser menolak huruf `abc`
 sebelum submit (`The specified value "abc" cannot be parsed`), sehingga
@@ -227,16 +228,16 @@ menyentuh database development.
 
 **Bukti M5** (2026-10-25):
 
-| Butir | Hasil |
-| --- | --- |
-| README | Ditulis ulang: prasyarat, cara run backend/frontend, 3 alternatif server, daftar endpoint + contoh `curl`, bentuk error, struktur folder, tabel 5 data seed |
-| PDF sumber | `docs/source/Application Data Kendaraan.pdf` ada (739.960 byte) |
-| Screenshot | **Belum** — diambil manual oleh user |
-| Konsistensi | `cc` hanya di tabel (`list.js:32`), form tanpa `cc`; tahun tampil apa adanya; 8 pesan validasi semuanya diakhiri titik |
-| Artefak Git | `git ls-files` bersih — tidak ada `bin/`, `obj/`, `*.db`, `node_modules` |
+| Butir       | Hasil                                                                                                                                                       |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| README      | Ditulis ulang: prasyarat, cara run backend/frontend, 3 alternatif server, daftar endpoint + contoh `curl`, bentuk error, struktur folder, tabel 5 data seed |
+| PDF sumber  | `docs/source/Application Data Kendaraan.pdf` ada (739.960 byte)                                                                                             |
+| Screenshot  | **Belum** — diambil manual oleh user                                                                                                                        |
+| Konsistensi | `cc` hanya di tabel (`list.js:32`), form tanpa `cc`; tahun tampil apa adanya; 8 pesan validasi semuanya diakhiri titik                                      |
+| Artefak Git | `git ls-files` bersih — tidak ada `bin/`, `obj/`, `*.db`, `node_modules`                                                                                    |
 
 Catatan verifikasi perintah README: `npx http-server . -p 5500 -c-1` diuji dan
-melayani `index.html`, `form.html`, `css/app.css`, `js/list.js` dengan `200`.
+melayani `index.html`, `form.html`, `css/app.css`, `js/pages/list.js` dengan `200`.
 Saat pengujian port 5500 sedang dipakai Live Server (PID `Code.exe`), sehingga
 uji dijalankan di port lain (5511) dengan hasil sama. `dotnet tool restore`
 juga diuji dan berhasil memasang `dotnet-ef 8.0.32`.
